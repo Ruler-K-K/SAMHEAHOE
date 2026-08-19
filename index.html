@@ -376,9 +376,27 @@ document.getElementById("load-game").addEventListener("click",event=>{
 });
 
 document.getElementById("back-title").addEventListener("click",()=>{
+
+  // 지도 닫기
   mapScreen.classList.remove("show");
+
+  // 타이틀 다시 표시
   titleScreen.style.display="block";
+
+  // 메뉴 닫기
+  titleMenu.classList.remove("show");
+
+  // "화면을 터치하세요" 다시 표시
+  touchText.style.display="block";
+
+  // 타이틀 첫 화면 상태로 초기화
+  titleOpened=false;
+  menuLocked=false;
+
+  // 과자 표시 상태 갱신
   renderTitleSnacks();
+
+});
 });
 
 /* 지도 렌더 */
