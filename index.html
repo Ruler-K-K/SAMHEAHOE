@@ -1,303 +1,596 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>어디에 두지?</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>三海會</title>
 <style>
-  * { box-sizing: border-box; }
-  html, body {
-    margin: 0;
-    min-height: 100%;
-    background: #171717;
-    color: #f4f0df;
-    font-family: "Courier New", "Dotum", monospace;
-  }
+:root{
+  --navy:#173c61;
+  --navy2:#102f4b;
+  --cream:#fff6d8;
+  --sky:#8fd7f0;
+  --sea:#2f8fcb;
+  --sea2:#1d6fa8;
+  --line:#d9c08a;
+  --red:#dc5a4d;
+  --ink:#1d3b56;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#78c9e8}
+body{
+  font-family:Arial,"Noto Sans KR","Malgun Gothic",sans-serif;
+  overflow-x:hidden;
+  color:var(--ink);
+}
+button{font:inherit}
 
-  body {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    padding: 20px 12px 36px;
-  }
+/* ===== APP ===== */
+.app{
+  width:100%;
+  min-height:100dvh;
+  position:relative;
+  overflow:hidden;
+}
 
-  .game {
-    width: min(760px, 100%);
-    text-align: center;
-  }
+/* ===== TITLE SCREEN ===== */
+#titleScreen{
+  min-height:100dvh;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-between;
+  padding:calc(24px + env(safe-area-inset-top)) 20px calc(26px + env(safe-area-inset-bottom));
+  background:
+    linear-gradient(to bottom,
+      #84d3ef 0%,
+      #b6e8f7 43%,
+      #54add7 44%,
+      #2d8bc4 69%,
+      #176fa8 100%);
+}
+#titleScreen::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.18;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.24) 0 2px,transparent 2px 7px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 2px,transparent 2px 8px);
+  mix-blend-mode:soft-light;
+}
+.cloud{
+  position:absolute;
+  background:#fff5dc;
+  box-shadow:
+    24px -12px 0 #fff5dc,
+    48px 0 0 #fff5dc,
+    70px -8px 0 #fff5dc;
+  width:54px;height:22px;
+  opacity:.92;
+}
+.cloud.c1{left:-6px;top:14%;transform:scale(1.3)}
+.cloud.c2{right:12px;top:10%;transform:scale(.9)}
+.cloud.c3{right:-24px;top:31%;transform:scale(1.15)}
+.gull{
+  position:absolute;
+  color:#173c61;
+  font-size:24px;
+  opacity:.8;
+  transform:rotate(-8deg);
+}
+.g1{left:12%;top:9%}
+.g2{right:15%;top:18%;font-size:18px}
+.g3{left:23%;top:33%;font-size:15px}
 
-  .top {
-    margin-bottom: 8px;
-  }
+.titleWrap{
+  z-index:2;
+  width:100%;
+  text-align:center;
+  margin-top:9vh;
+}
+.logo{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(64px,18vw,104px);
+  font-weight:900;
+  letter-spacing:.02em;
+  line-height:.92;
+  color:#173c61;
+  text-shadow:
+    3px 0 #fff5d9,-3px 0 #fff5d9,
+    0 3px #fff5d9,0 -3px #fff5d9,
+    4px 4px 0 rgba(21,65,92,.18);
+}
+.eng{
+  margin-top:14px;
+  letter-spacing:.36em;
+  font-weight:800;
+  font-size:clamp(15px,4vw,23px);
+  color:#173c61;
+}
+.anchorLine{
+  margin:18px auto 0;
+  width:min(250px,72vw);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#2f6e92;
+}
+.anchorLine::before,.anchorLine::after{
+  content:"";
+  height:2px;
+  background:#2f6e92;
+  flex:1;
+  opacity:.55;
+}
+.anchorLine span{font-size:24px}
 
-  h1 {
-    margin: 0;
-    font-size: clamp(22px, 4vw, 34px);
-    letter-spacing: -1px;
-  }
+/* simple sea sparkle */
+.sparkles{
+  position:absolute;
+  inset:48% 0 0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 12% 22%,#fff8d7 0 2px,transparent 3px),
+    radial-gradient(circle at 38% 39%,#fff8d7 0 2px,transparent 3px),
+    radial-gradient(circle at 73% 18%,#fff8d7 0 2px,transparent 3px),
+    radial-gradient(circle at 89% 48%,#fff8d7 0 2px,transparent 3px),
+    radial-gradient(circle at 58% 72%,#fff8d7 0 2px,transparent 3px);
+  opacity:.8;
+}
 
-  .hint {
-    margin: 8px 0 0;
-    color: #bbb39e;
-    font-size: 14px;
-  }
+/* ===== TAP / MENU ===== */
+.bottomZone{
+  z-index:3;
+  width:min(430px,100%);
+  min-height:245px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+}
+.tapPrompt{
+  margin-bottom:5vh;
+  font-size:clamp(18px,5vw,25px);
+  font-weight:800;
+  color:#fff9e4;
+  text-shadow:0 2px 0 var(--navy2),2px 0 0 var(--navy2),-2px 0 0 var(--navy2);
+  animation:blink 1.15s steps(2,end) infinite;
+}
+@keyframes blink{50%{opacity:.35}}
 
-  .stage {
-    position: relative;
-    width: min(92vw, 560px);
-    aspect-ratio: 540 / 720;
-    margin: 14px auto 0;
-  }
+.mainMenu{
+  width:100%;
+  display:none;
+  background:rgba(255,246,216,.96);
+  border:4px solid var(--navy);
+  box-shadow:0 0 0 4px rgba(255,246,216,.78),0 8px 0 rgba(14,55,83,.18);
+  padding:14px;
+  margin-bottom:2vh;
+}
+.mainMenu.show{display:block;animation:menuIn .2s ease-out}
+@keyframes menuIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.menuBtn{
+  width:100%;
+  border:0;
+  background:transparent;
+  padding:14px 18px;
+  color:var(--navy);
+  font-size:20px;
+  font-weight:850;
+  text-align:left;
+  cursor:pointer;
+  border-bottom:2px dashed rgba(23,60,97,.2);
+}
+.menuBtn:last-child{border-bottom:0}
+.menuBtn:hover,.menuBtn:focus{background:#f4e7b8;outline:2px solid var(--navy)}
+.menuBtn::before{
+  content:"";
+  display:inline-block;
+  width:0;height:0;
+  border-top:7px solid transparent;
+  border-bottom:7px solid transparent;
+  border-left:11px solid var(--red);
+  margin-right:14px;
+  opacity:0;
+}
+.menuBtn:hover::before,.menuBtn:focus::before{opacity:1}
 
-  .map {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    image-rendering: pixelated;
-    pointer-events: none;
-    user-select: none;
-  }
+/* ===== GAME SCREEN ===== */
+#gameScreen{
+  display:none;
+  min-height:100dvh;
+  background:linear-gradient(#aee5f2,#eaf4e2 42%,#f8edc8);
+  padding:14px 12px calc(24px + env(safe-area-inset-bottom));
+}
+#gameScreen.show{display:block}
+.gameHead{
+  width:min(520px,100%);
+  margin:0 auto 10px;
+  text-align:center;
+}
+.gameHead h2{margin:0;font-family:Georgia,serif;font-size:34px;color:var(--navy)}
+.gameHead p{margin:4px 0 0;font-size:13px;color:#496372}
+.mapBox{
+  position:relative;
+  width:min(520px,100%);
+  margin:0 auto;
+}
+.map{
+  display:block;
+  width:100%;
+  height:auto;
+  image-rendering:pixelated;
+  filter:drop-shadow(0 5px 0 rgba(18,66,91,.12));
+}
+.city{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  display:flex;
+  align-items:center;
+  gap:5px;
+  pointer-events:none;
+  z-index:5;
+}
+.cityDot{
+  width:13px;height:13px;border-radius:50%;
+  background:#e34b3d;
+  border:3px solid #fff7db;
+  box-shadow:0 0 0 2px var(--navy);
+}
+.cityName{
+  color:#fff7db;
+  font-size:17px;
+  font-weight:900;
+  text-shadow:
+    2px 0 var(--navy),-2px 0 var(--navy),
+    0 2px var(--navy),0 -2px var(--navy),
+    2px 2px var(--navy);
+}
+#cityIncheon{left:29%;top:23%}
+#cityYangyang{left:72%;top:13%}
+#cityBusan{left:75%;top:64%}
+.target{
+  position:absolute;
+  width:14%;
+  aspect-ratio:1;
+  border:3px dashed rgba(255,255,255,.95);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  opacity:0;
+  z-index:4;
+}
+.dragging .target{opacity:.8}
+#targetIncheon{left:31%;top:23%}
+#targetYangyang{left:69%;top:13%}
+#targetBusan{left:72%;top:64%}
+.status{
+  width:min(520px,100%);
+  margin:8px auto 10px;
+  background:#fff8df;
+  border:3px solid var(--navy);
+  padding:11px 14px;
+  font-size:14px;
+  line-height:1.5;
+  color:var(--navy2);
+}
+.items{
+  width:min(520px,100%);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.item{
+  min-height:120px;
+  background:#fff8df;
+  border:3px solid #8da09a;
+  padding:8px 4px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:5px;
+  touch-action:none;
+  cursor:grab;
+  user-select:none;
+}
+.item.done{opacity:.35;pointer-events:none}
+.item img{
+  width:76px;height:76px;
+  object-fit:contain;
+  image-rendering:pixelated;
+  pointer-events:none;
+}
+.item span{font-size:11px;font-weight:800;text-align:center}
+.ghost{
+  position:fixed;
+  width:100px;height:100px;
+  z-index:999;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.ghost img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.snap{
+  position:absolute;
+  width:14%;
+  transform:translate(-50%,-50%);
+  z-index:8;
+  image-rendering:pixelated;
+  pointer-events:none;
+}
+.backBtn{
+  display:block;
+  width:min(520px,100%);
+  margin:12px auto 0;
+  background:var(--navy);
+  color:white;
+  border:0;
+  padding:12px;
+  font-weight:800;
+  cursor:pointer;
+}
 
-  .target {
-    position: absolute;
-    width: 11%;
-    aspect-ratio: 1;
-    transform: translate(-50%, -50%);
-    border: 2px dashed rgba(255,255,255,.35);
-    border-radius: 50%;
-    opacity: 0;
-    transition: opacity .15s ease;
-  }
-
-  .stage.show-targets .target {
-    opacity: 1;
-  }
-
-  /* Target positions tuned to the provided map */
-  #target-incheon { left: 31%; top: 23%; }
-  #target-yangyang { left: 69%; top: 13%; }
-  #target-busan   { left: 72%; top: 64%; }
-
-  .status {
-    min-height: 24px;
-    margin: 8px 0 12px;
-    font-size: 14px;
-    color: #f3d36a;
-  }
-
-  .inventory {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    width: min(660px, 100%);
-    margin: 0 auto;
-  }
-
-  .item {
-    position: relative;
-    min-height: 142px;
-    padding: 10px 8px 8px;
-    border: 2px solid #57534a;
-    background: #232323;
-    cursor: grab;
-    user-select: none;
-    touch-action: none;
-  }
-
-  .item:active { cursor: grabbing; }
-
-  .item img {
-    width: 92px;
-    height: 92px;
-    object-fit: contain;
-    image-rendering: pixelated;
-    pointer-events: none;
-  }
-
-  .item .name {
-    display: block;
-    margin-top: 2px;
-    font-size: 13px;
-    color: #e8e3d6;
-  }
-
-  .item.done {
-    opacity: .35;
-    pointer-events: none;
-  }
-
-  .ghost {
-    position: fixed;
-    z-index: 999;
-    width: 110px;
-    height: 110px;
-    pointer-events: none;
-    transform: translate(-50%, -50%);
-  }
-
-  .ghost img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    image-rendering: pixelated;
-  }
-
-  .snap {
-    position: absolute;
-    z-index: 4;
-    width: 13%;
-    transform: translate(-50%, -50%);
-    image-rendering: pixelated;
-    pointer-events: none;
-    animation: pop .18s steps(2, end);
-  }
-
-  @keyframes pop {
-    0% { transform: translate(-50%, -50%) scale(.7); }
-    100% { transform: translate(-50%, -50%) scale(1); }
-  }
-
-  .complete {
-    display: none;
-    margin: 16px auto 0;
-    padding: 16px;
-    width: min(500px, 100%);
-    border: 3px double #f4f0df;
-    background: #111;
-    font-size: 18px;
-  }
-
-  .complete.show { display: block; }
-
-  @media (max-width: 520px) {
-    .inventory { gap: 6px; }
-    .item { min-height: 116px; padding: 6px 4px; }
-    .item img { width: 72px; height: 72px; }
-    .item .name { font-size: 11px; }
-  }
+/* ===== MODAL ===== */
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  background:rgba(14,45,67,.46);
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.modal.show{display:flex}
+.modalBox{
+  width:min(380px,100%);
+  background:#fff8df;
+  border:4px solid var(--navy);
+  padding:18px;
+  color:var(--navy);
+}
+.modalBox h3{margin:0 0 14px}
+.optionRow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed #b9aa7d}
+.optionRow:last-of-type{border-bottom:0}
+.smallBtn{border:2px solid var(--navy);background:#f5e8b8;color:var(--navy);padding:8px 12px;font-weight:800}
+.closeBtn{margin-top:14px;width:100%;padding:10px;background:var(--navy);color:white;border:0;font-weight:800}
 </style>
 </head>
 <body>
-<main class="game">
-  <div class="top">
-    <h1>어디에 두지?</h1>
-    <p class="hint">물건을 알맞은 지역에 끌어다 놓아보세요.</p>
-  </div>
+<div class="app">
 
-  <section class="stage" id="stage" aria-label="대한민국 도트 지도">
-    <img class="map" src="assets/korea_map.png" alt="인천, 양양, 부산이 표시된 대한민국 도트 지도" />
-    <div class="target" id="target-incheon"></div>
-    <div class="target" id="target-yangyang"></div>
-    <div class="target" id="target-busan"></div>
+  <!-- TITLE -->
+  <section id="titleScreen">
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+    <div class="gull g1">⌁</div>
+    <div class="gull g2">⌁</div>
+    <div class="gull g3">⌁</div>
+    <div class="sparkles"></div>
+
+    <div class="titleWrap">
+      <div class="logo">三海會</div>
+      <div class="eng">SAMHAEHOE</div>
+      <div class="anchorLine"><span>⚓</span></div>
+    </div>
+
+    <div class="bottomZone">
+      <div class="tapPrompt" id="tapPrompt">- 화면을 터치하세요 -</div>
+
+      <nav class="mainMenu" id="mainMenu" aria-label="메인 메뉴">
+        <button class="menuBtn" id="newGameBtn">새 게임</button>
+        <button class="menuBtn" id="loadBtn">불러오기</button>
+        <button class="menuBtn" id="optionBtn">옵션</button>
+      </nav>
+    </div>
   </section>
 
-  <div class="status" id="status">물건을 잡아보세요.</div>
+  <!-- GAME -->
+  <section id="gameScreen">
+    <div class="gameHead">
+      <h2>三海會</h2>
+      <p>흩어진 물건이 세 개 있다.</p>
+    </div>
 
-  <section class="inventory">
-    <div class="item" data-key="busan" data-target="target-busan" data-src="assets/spicy_shrimp.png">
-      <img src="assets/spicy_shrimp.png" alt="매운 새우깡" />
-      <span class="name">매운 새우깡</span>
+    <div class="mapBox" id="mapBox">
+      <img class="map" src="assets/korea_map.png" alt="대한민국 픽셀 지도">
+
+      <div class="target" id="targetIncheon"></div>
+      <div class="target" id="targetYangyang"></div>
+      <div class="target" id="targetBusan"></div>
+
+      <div class="city" id="cityIncheon"><span class="cityDot"></span><span class="cityName">인천</span></div>
+      <div class="city" id="cityYangyang"><span class="cityDot"></span><span class="cityName">양양</span></div>
+      <div class="city" id="cityBusan"><span class="cityDot"></span><span class="cityName">부산</span></div>
     </div>
-    <div class="item" data-key="incheon" data-target="target-incheon" data-src="assets/sunglasses.png">
-      <img src="assets/sunglasses.png" alt="선글라스" />
-      <span class="name">선글라스</span>
+
+    <div class="status" id="status">이런 걸 흘리고 다니는 놈들이 누구지.</div>
+
+    <div class="items">
+      <div class="item" data-key="busan" data-target="targetBusan" data-src="assets/spicy_shrimp.png">
+        <img src="assets/spicy_shrimp.png" alt="매운 새우깡">
+        <span>매운 새우깡</span>
+      </div>
+      <div class="item" data-key="incheon" data-target="targetIncheon" data-src="assets/sunglasses.png">
+        <img src="assets/sunglasses.png" alt="선글라스">
+        <span>선글라스</span>
+      </div>
+      <div class="item" data-key="yangyang" data-target="targetYangyang" data-src="assets/hawaiian_shirt.png">
+        <img src="assets/hawaiian_shirt.png" alt="하와이안 셔츠">
+        <span>하와이안 셔츠</span>
+      </div>
     </div>
-    <div class="item" data-key="yangyang" data-target="target-yangyang" data-src="assets/hawaiian_shirt.png">
-      <img src="assets/hawaiian_shirt.png" alt="하와이안 셔츠" />
-      <span class="name">하와이안 셔츠</span>
-    </div>
+
+    <button class="backBtn" id="backBtn">타이틀로</button>
   </section>
+</div>
 
-  <div class="complete" id="complete">
-    끼룩.<br><br>
-    전부 제자리다.
+<!-- OPTIONS -->
+<div class="modal" id="optionModal">
+  <div class="modalBox">
+    <h3>옵션</h3>
+    <div class="optionRow"><span>효과음</span><button class="smallBtn" id="sfxBtn">ON</button></div>
+    <div class="optionRow"><span>진행 초기화</span><button class="smallBtn" id="resetBtn">초기화</button></div>
+    <button class="closeBtn" id="closeOption">닫기</button>
   </div>
-</main>
+</div>
 
 <script>
-(() => {
-  const stage = document.getElementById("stage");
+(()=>{
+  const titleScreen = document.getElementById("titleScreen");
+  const tapPrompt = document.getElementById("tapPrompt");
+  const mainMenu = document.getElementById("mainMenu");
+  const gameScreen = document.getElementById("gameScreen");
+  const optionModal = document.getElementById("optionModal");
   const status = document.getElementById("status");
-  const complete = document.getElementById("complete");
-  let solved = 0;
+  const mapBox = document.getElementById("mapBox");
 
-  document.querySelectorAll(".item").forEach(item => {
-    let ghost = null;
-    let dragging = false;
+  let menuOpened = false;
+  let solved = new Set(JSON.parse(localStorage.getItem("samhaehoeSolved") || "[]"));
+  let sfx = localStorage.getItem("samhaehoeSfx") !== "off";
 
-    item.addEventListener("pointerdown", (e) => {
-      if (item.classList.contains("done")) return;
+  function openMenu(){
+    if(menuOpened) return;
+    menuOpened = true;
+    tapPrompt.style.display = "none";
+    mainMenu.classList.add("show");
+  }
 
-      dragging = true;
+  titleScreen.addEventListener("pointerdown", (e)=>{
+    if(e.target.closest("button")) return;
+    openMenu();
+  });
+
+  function showGame(useSave=false){
+    titleScreen.style.display = "none";
+    gameScreen.classList.add("show");
+
+    if(!useSave){
+      solved = new Set();
+      localStorage.setItem("samhaehoeSolved","[]");
+    }
+    renderSolved();
+  }
+
+  document.getElementById("newGameBtn").addEventListener("click", ()=>showGame(false));
+  document.getElementById("loadBtn").addEventListener("click", ()=>{
+    if(solved.size===0){
+      alert("저장된 진행 기록이 없습니다.");
+      return;
+    }
+    showGame(true);
+  });
+  document.getElementById("optionBtn").addEventListener("click", ()=>optionModal.classList.add("show"));
+  document.getElementById("closeOption").addEventListener("click", ()=>optionModal.classList.remove("show"));
+
+  const sfxBtn = document.getElementById("sfxBtn");
+  sfxBtn.textContent = sfx ? "ON" : "OFF";
+  sfxBtn.addEventListener("click", ()=>{
+    sfx=!sfx;
+    localStorage.setItem("samhaehoeSfx", sfx ? "on" : "off");
+    sfxBtn.textContent = sfx ? "ON" : "OFF";
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", ()=>{
+    solved.clear();
+    localStorage.removeItem("samhaehoeSolved");
+    alert("진행 기록을 초기화했습니다.");
+  });
+
+  document.getElementById("backBtn").addEventListener("click", ()=>{
+    gameScreen.classList.remove("show");
+    titleScreen.style.display = "flex";
+  });
+
+  function saveSolved(){
+    localStorage.setItem("samhaehoeSolved", JSON.stringify([...solved]));
+  }
+
+  function renderSolved(){
+    document.querySelectorAll(".snap").forEach(el=>el.remove());
+    document.querySelectorAll(".item").forEach(item=>{
+      item.classList.toggle("done", solved.has(item.dataset.key));
+      if(solved.has(item.dataset.key)) placeSnap(item);
+    });
+  }
+
+  function placeSnap(item){
+    const target = document.getElementById(item.dataset.target);
+    const wr = mapBox.getBoundingClientRect();
+    const tr = target.getBoundingClientRect();
+    const snap = document.createElement("img");
+    snap.className = "snap";
+    snap.src = item.dataset.src;
+    snap.alt = "";
+    snap.style.left = `${((tr.left + tr.width/2 - wr.left)/wr.width)*100}%`;
+    snap.style.top = `${((tr.top + tr.height/2 - wr.top)/wr.height)*100}%`;
+    mapBox.appendChild(snap);
+  }
+
+  document.querySelectorAll(".item").forEach(item=>{
+    let ghost=null;
+    let dragging=false;
+
+    item.addEventListener("pointerdown",e=>{
+      if(item.classList.contains("done")) return;
+      dragging=true;
       item.setPointerCapture(e.pointerId);
-      stage.classList.add("show-targets");
+      mapBox.classList.add("dragging");
 
-      ghost = document.createElement("div");
-      ghost.className = "ghost";
-      ghost.innerHTML = `<img src="${item.dataset.src}" alt="">`;
+      ghost=document.createElement("div");
+      ghost.className="ghost";
+      ghost.innerHTML=`<img src="${item.dataset.src}" alt="">`;
       document.body.appendChild(ghost);
-      moveGhost(e);
-      status.textContent = "지도 위에 놓아보세요.";
+      move(e);
     });
 
-    item.addEventListener("pointermove", (e) => {
-      if (!dragging || !ghost) return;
-      moveGhost(e);
+    item.addEventListener("pointermove",e=>{
+      if(dragging&&ghost) move(e);
     });
 
-    item.addEventListener("pointerup", (e) => {
-      if (!dragging) return;
-      dragging = false;
-      stage.classList.remove("show-targets");
+    item.addEventListener("pointerup",e=>{
+      if(!dragging)return;
+      dragging=false;
+      mapBox.classList.remove("dragging");
 
-      const target = document.getElementById(item.dataset.target);
-      const rect = target.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const distance = Math.hypot(e.clientX - cx, e.clientY - cy);
-      const allowed = Math.max(rect.width, rect.height) * 1.2;
+      const target=document.getElementById(item.dataset.target);
+      const r=target.getBoundingClientRect();
+      const cx=r.left+r.width/2;
+      const cy=r.top+r.height/2;
+      const dist=Math.hypot(e.clientX-cx,e.clientY-cy);
+      const allowed=Math.max(r.width,r.height)*1.45;
 
-      if (ghost) {
-        ghost.remove();
-        ghost = null;
-      }
+      if(ghost){ghost.remove();ghost=null;}
 
-      if (distance <= allowed) {
+      if(dist<=allowed){
+        solved.add(item.dataset.key);
+        saveSolved();
         item.classList.add("done");
+        placeSnap(item);
 
-        const stageRect = stage.getBoundingClientRect();
-        const targetRect = target.getBoundingClientRect();
-
-        const snap = document.createElement("img");
-        snap.className = "snap";
-        snap.src = item.dataset.src;
-        snap.alt = "";
-        snap.style.left = `${((targetRect.left + targetRect.width/2 - stageRect.left) / stageRect.width) * 100}%`;
-        snap.style.top = `${((targetRect.top + targetRect.height/2 - stageRect.top) / stageRect.height) * 100}%`;
-        stage.appendChild(snap);
-
-        solved += 1;
-        status.textContent = "딱 맞았다.";
-
-        if (solved === 3) {
-          status.textContent = "전부 맞췄다.";
-          setTimeout(() => complete.classList.add("show"), 250);
+        if(solved.size===3){
+          status.textContent="세 개 전부 제자리. 그런데 대체, 이런 걸 흘리고 다니는 놈들이 누구지.";
+        }else{
+          status.textContent="찾았다.";
         }
-      } else {
-        status.textContent = "거긴 아닌 것 같은데...";
+      }else{
+        status.textContent="이곳은 아닌 것 같다.";
       }
     });
 
-    item.addEventListener("pointercancel", () => {
-      dragging = false;
-      stage.classList.remove("show-targets");
-      if (ghost) ghost.remove();
-      ghost = null;
+    item.addEventListener("pointercancel",()=>{
+      dragging=false;
+      mapBox.classList.remove("dragging");
+      if(ghost)ghost.remove();
+      ghost=null;
     });
 
-    function moveGhost(e) {
-      ghost.style.left = `${e.clientX}px`;
-      ghost.style.top = `${e.clientY}px`;
+    function move(e){
+      ghost.style.left=e.clientX+"px";
+      ghost.style.top=e.clientY+"px";
     }
   });
 })();
