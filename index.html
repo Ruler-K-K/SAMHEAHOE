@@ -2,598 +2,1574 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>三海會</title>
+
 <style>
 :root{
-  --navy:#173c61;
-  --navy2:#102f4b;
-  --cream:#fff6d8;
-  --sky:#8fd7f0;
-  --sea:#2f8fcb;
-  --sea2:#1d6fa8;
-  --line:#d9c08a;
-  --red:#dc5a4d;
-  --ink:#1d3b56;
+  --navy:#173b61;
+  --navy2:#0f2f4d;
+  --cream:#fff4d4;
+  --cream2:#f7e4b5;
+  --sky:#8ed5ef;
+  --sea:#258fc8;
+  --red:#df5f4f;
+  --ink:#173b61;
 }
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:#78c9e8}
-body{
-  font-family:Arial,"Noto Sans KR","Malgun Gothic",sans-serif;
-  overflow-x:hidden;
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html,body{
+  width:100%;
+  min-height:100%;
+  background:#0f5f91;
+  font-family:Arial,"Malgun Gothic",sans-serif;
   color:var(--ink);
 }
-button{font:inherit}
 
-/* ===== APP ===== */
-.app{
+button{
+  font:inherit;
+}
+
+body{
+  display:flex;
+  justify-content:center;
+}
+
+#app{
   width:100%;
+  max-width:520px;
   min-height:100dvh;
+  background:#8ed5ef;
+  overflow:hidden;
   position:relative;
+}
+
+/* =========================
+   1. TITLE SCREEN
+========================= */
+
+#title-screen{
+  position:relative;
+  width:100%;
+  height:100dvh;
+  min-height:640px;
+
+  background-image:url("assets/title-bg.png");
+  background-size:cover;
+  background-position:center top;
+  background-repeat:no-repeat;
+
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* 첫 접속 때만 보이는 문구 */
+#touch-text{
+  position:absolute;
+
+  left:50%;
+  top:63%;
+
+  transform:translate(-50%,-50%);
+
+  width:100%;
+
+  text-align:center;
+
+  color:#fff5d8;
+
+  font-size:clamp(19px,5.4vw,26px);
+  font-weight:900;
+  letter-spacing:.02em;
+
+  text-shadow:
+    2px 0 var(--navy2),
+    -2px 0 var(--navy2),
+    0 2px var(--navy2),
+    0 -2px var(--navy2),
+    2px 2px var(--navy2);
+
+  animation:blink 1.05s steps(2,end) infinite;
+}
+
+@keyframes blink{
+  50%{ opacity:.30; }
+}
+
+
+/* =========================
+   2. TITLE MENU
+========================= */
+
+#title-menu{
+  display:none;
+
+  position:absolute;
+  left:50%;
+  top:66%;
+
+  transform:translate(-50%,-50%);
+
+  width:82%;
+  max-width:360px;
+
+  padding:12px 16px;
+
+  background:rgba(255,244,212,.97);
+
+  border:4px solid var(--navy);
+
+  box-shadow:
+    0 0 0 4px rgba(255,244,212,.72),
+    0 8px 0 rgba(15,47,77,.18);
+}
+
+#title-menu.show{
+  display:block;
+  animation:menuIn .18s ease-out;
+}
+
+@keyframes menuIn{
+  from{
+    opacity:0;
+    transform:translate(-50%,-46%);
+  }
+  to{
+    opacity:1;
+    transform:translate(-50%,-50%);
+  }
+}
+
+.menu-button{
+  display:block;
+
+  width:100%;
+
+  border:0;
+  border-bottom:2px dashed #cbbd9d;
+
+  background:transparent;
+
+  padding:15px 10px;
+
+  color:var(--navy);
+
+  font-size:20px;
+  font-weight:900;
+
+  text-align:left;
+
+  cursor:pointer;
+}
+
+.menu-button:last-child{
+  border-bottom:0;
+}
+
+.menu-button::before{
+  content:"▶";
+  display:inline-block;
+  width:34px;
+
+  color:var(--red);
+  opacity:0;
+}
+
+.menu-button:hover::before,
+.menu-button:focus::before,
+.menu-button:active::before{
+  opacity:1;
+}
+
+
+/* =========================
+   3. MAP GAME SCREEN
+========================= */
+
+#map-screen{
+  display:none;
+
+  min-height:100dvh;
+
+  padding:
+    calc(14px + env(safe-area-inset-top))
+    12px
+    calc(22px + env(safe-area-inset-bottom));
+
+  background:
+    linear-gradient(
+      #aee5f3 0%,
+      #dff3ed 48%,
+      #fff0c8 100%
+    );
+}
+
+#map-screen.show{
+  display:block;
+}
+
+.map-header{
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.map-header h1{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:32px;
+  color:var(--navy);
+}
+
+.map-header p{
+  margin-top:4px;
+  font-size:13px;
+  color:#4f6a76;
+}
+
+/* 지도 */
+.map-wrap{
+  position:relative;
+
+  width:100%;
+  max-width:500px;
+
+  margin:0 auto;
+
+  border:3px solid var(--navy);
+  background:#87d0e4;
+
   overflow:hidden;
 }
 
-/* ===== TITLE SCREEN ===== */
-#titleScreen{
-  min-height:100dvh;
-  position:relative;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:space-between;
-  padding:calc(24px + env(safe-area-inset-top)) 20px calc(26px + env(safe-area-inset-bottom));
-  background:
-    linear-gradient(to bottom,
-      #84d3ef 0%,
-      #b6e8f7 43%,
-      #54add7 44%,
-      #2d8bc4 69%,
-      #176fa8 100%);
-}
-#titleScreen::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  opacity:.18;
-  pointer-events:none;
-  background:
-    repeating-linear-gradient(0deg,rgba(255,255,255,.24) 0 2px,transparent 2px 7px),
-    repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 2px,transparent 2px 8px);
-  mix-blend-mode:soft-light;
-}
-.cloud{
-  position:absolute;
-  background:#fff5dc;
-  box-shadow:
-    24px -12px 0 #fff5dc,
-    48px 0 0 #fff5dc,
-    70px -8px 0 #fff5dc;
-  width:54px;height:22px;
-  opacity:.92;
-}
-.cloud.c1{left:-6px;top:14%;transform:scale(1.3)}
-.cloud.c2{right:12px;top:10%;transform:scale(.9)}
-.cloud.c3{right:-24px;top:31%;transform:scale(1.15)}
-.gull{
-  position:absolute;
-  color:#173c61;
-  font-size:24px;
-  opacity:.8;
-  transform:rotate(-8deg);
-}
-.g1{left:12%;top:9%}
-.g2{right:15%;top:18%;font-size:18px}
-.g3{left:23%;top:33%;font-size:15px}
-
-.titleWrap{
-  z-index:2;
-  width:100%;
-  text-align:center;
-  margin-top:9vh;
-}
-.logo{
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:clamp(64px,18vw,104px);
-  font-weight:900;
-  letter-spacing:.02em;
-  line-height:.92;
-  color:#173c61;
-  text-shadow:
-    3px 0 #fff5d9,-3px 0 #fff5d9,
-    0 3px #fff5d9,0 -3px #fff5d9,
-    4px 4px 0 rgba(21,65,92,.18);
-}
-.eng{
-  margin-top:14px;
-  letter-spacing:.36em;
-  font-weight:800;
-  font-size:clamp(15px,4vw,23px);
-  color:#173c61;
-}
-.anchorLine{
-  margin:18px auto 0;
-  width:min(250px,72vw);
-  display:flex;
-  align-items:center;
-  gap:10px;
-  color:#2f6e92;
-}
-.anchorLine::before,.anchorLine::after{
-  content:"";
-  height:2px;
-  background:#2f6e92;
-  flex:1;
-  opacity:.55;
-}
-.anchorLine span{font-size:24px}
-
-/* simple sea sparkle */
-.sparkles{
-  position:absolute;
-  inset:48% 0 0;
-  pointer-events:none;
-  background:
-    radial-gradient(circle at 12% 22%,#fff8d7 0 2px,transparent 3px),
-    radial-gradient(circle at 38% 39%,#fff8d7 0 2px,transparent 3px),
-    radial-gradient(circle at 73% 18%,#fff8d7 0 2px,transparent 3px),
-    radial-gradient(circle at 89% 48%,#fff8d7 0 2px,transparent 3px),
-    radial-gradient(circle at 58% 72%,#fff8d7 0 2px,transparent 3px);
-  opacity:.8;
-}
-
-/* ===== TAP / MENU ===== */
-.bottomZone{
-  z-index:3;
-  width:min(430px,100%);
-  min-height:245px;
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-}
-.tapPrompt{
-  margin-bottom:5vh;
-  font-size:clamp(18px,5vw,25px);
-  font-weight:800;
-  color:#fff9e4;
-  text-shadow:0 2px 0 var(--navy2),2px 0 0 var(--navy2),-2px 0 0 var(--navy2);
-  animation:blink 1.15s steps(2,end) infinite;
-}
-@keyframes blink{50%{opacity:.35}}
-
-.mainMenu{
-  width:100%;
-  display:none;
-  background:rgba(255,246,216,.96);
-  border:4px solid var(--navy);
-  box-shadow:0 0 0 4px rgba(255,246,216,.78),0 8px 0 rgba(14,55,83,.18);
-  padding:14px;
-  margin-bottom:2vh;
-}
-.mainMenu.show{display:block;animation:menuIn .2s ease-out}
-@keyframes menuIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.menuBtn{
-  width:100%;
-  border:0;
-  background:transparent;
-  padding:14px 18px;
-  color:var(--navy);
-  font-size:20px;
-  font-weight:850;
-  text-align:left;
-  cursor:pointer;
-  border-bottom:2px dashed rgba(23,60,97,.2);
-}
-.menuBtn:last-child{border-bottom:0}
-.menuBtn:hover,.menuBtn:focus{background:#f4e7b8;outline:2px solid var(--navy)}
-.menuBtn::before{
-  content:"";
-  display:inline-block;
-  width:0;height:0;
-  border-top:7px solid transparent;
-  border-bottom:7px solid transparent;
-  border-left:11px solid var(--red);
-  margin-right:14px;
-  opacity:0;
-}
-.menuBtn:hover::before,.menuBtn:focus::before{opacity:1}
-
-/* ===== GAME SCREEN ===== */
-#gameScreen{
-  display:none;
-  min-height:100dvh;
-  background:linear-gradient(#aee5f2,#eaf4e2 42%,#f8edc8);
-  padding:14px 12px calc(24px + env(safe-area-inset-bottom));
-}
-#gameScreen.show{display:block}
-.gameHead{
-  width:min(520px,100%);
-  margin:0 auto 10px;
-  text-align:center;
-}
-.gameHead h2{margin:0;font-family:Georgia,serif;font-size:34px;color:var(--navy)}
-.gameHead p{margin:4px 0 0;font-size:13px;color:#496372}
-.mapBox{
-  position:relative;
-  width:min(520px,100%);
-  margin:0 auto;
-}
-.map{
+.map-image{
   display:block;
+
   width:100%;
   height:auto;
+
   image-rendering:pixelated;
-  filter:drop-shadow(0 5px 0 rgba(18,66,91,.12));
 }
+
+/* 도시 라벨 */
 .city{
   position:absolute;
+  z-index:10;
+
   transform:translate(-50%,-50%);
+
   display:flex;
   align-items:center;
   gap:5px;
+
   pointer-events:none;
-  z-index:5;
 }
-.cityDot{
-  width:13px;height:13px;border-radius:50%;
-  background:#e34b3d;
-  border:3px solid #fff7db;
+
+.city-dot{
+  width:13px;
+  height:13px;
+
+  border-radius:50%;
+
+  background:#e74d40;
+
+  border:3px solid #fff3cf;
+
   box-shadow:0 0 0 2px var(--navy);
 }
-.cityName{
-  color:#fff7db;
-  font-size:17px;
+
+.city-name{
+  color:#fff7d7;
+
+  font-size:16px;
   font-weight:900;
+
   text-shadow:
-    2px 0 var(--navy),-2px 0 var(--navy),
-    0 2px var(--navy),0 -2px var(--navy),
+    2px 0 var(--navy),
+    -2px 0 var(--navy),
+    0 2px var(--navy),
+    0 -2px var(--navy),
     2px 2px var(--navy);
 }
-#cityIncheon{left:29%;top:23%}
-#cityYangyang{left:72%;top:13%}
-#cityBusan{left:75%;top:64%}
+
+/*
+  좌표는 %라서 모바일 크기가 바뀌어도
+  지도 이미지에 붙어서 움직임.
+*/
+
+#city-incheon{
+  left:28%;
+  top:23%;
+}
+
+#city-yangyang{
+  left:71%;
+  top:14%;
+}
+
+#city-busan{
+  left:74%;
+  top:65%;
+}
+
+
+/* 드래그 판정용 영역 */
 .target{
   position:absolute;
-  width:14%;
+
+  z-index:9;
+
+  transform:translate(-50%,-50%);
+
+  width:17%;
   aspect-ratio:1;
+
   border:3px dashed rgba(255,255,255,.95);
   border-radius:50%;
-  transform:translate(-50%,-50%);
+
+  background:rgba(255,217,90,.16);
+
   opacity:0;
-  z-index:4;
+
+  pointer-events:none;
 }
-.dragging .target{opacity:.8}
-#targetIncheon{left:31%;top:23%}
-#targetYangyang{left:69%;top:13%}
-#targetBusan{left:72%;top:64%}
-.status{
-  width:min(520px,100%);
-  margin:8px auto 10px;
-  background:#fff8df;
+
+.map-wrap.dragging .target{
+  opacity:.85;
+  animation:targetBlink .65s steps(2,end) infinite;
+}
+
+@keyframes targetBlink{
+  50%{opacity:.28}
+}
+
+#target-incheon{
+  left:28%;
+  top:23%;
+}
+
+#target-yangyang{
+  left:71%;
+  top:14%;
+}
+
+#target-busan{
+  left:74%;
+  top:65%;
+}
+
+
+/* 상태창 */
+#status{
+  width:100%;
+  max-width:500px;
+
+  margin:10px auto 8px;
+
+  padding:11px 13px;
+
   border:3px solid var(--navy);
-  padding:11px 14px;
-  font-size:14px;
-  line-height:1.5;
-  color:var(--navy2);
+
+  background:#fff6d9;
+
+  font-size:13px;
+  line-height:1.55;
 }
-.items{
-  width:min(520px,100%);
+
+
+/* 아이템 */
+.inventory-title{
+  width:100%;
+  max-width:500px;
+
+  margin:10px auto 5px;
+
+  font-size:12px;
+  font-weight:900;
+
+  color:var(--navy);
+}
+
+.inventory{
+  width:100%;
+  max-width:500px;
+
   margin:0 auto;
+
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:8px;
+  gap:7px;
 }
+
 .item{
-  min-height:120px;
-  background:#fff8df;
-  border:3px solid #8da09a;
-  padding:8px 4px;
+  min-height:116px;
+
+  border:3px solid #718b89;
+
+  background:#fff6d9;
+
   display:flex;
   flex-direction:column;
-  justify-content:center;
+
   align-items:center;
+  justify-content:center;
+
   gap:5px;
-  touch-action:none;
+
+  padding:7px 4px;
+
   cursor:grab;
+
   user-select:none;
+  touch-action:none;
 }
-.item.done{opacity:.35;pointer-events:none}
+
+.item:active{
+  cursor:grabbing;
+}
+
+.item.done{
+  opacity:.32;
+  pointer-events:none;
+}
+
 .item img{
-  width:76px;height:76px;
+  width:72px;
+  height:72px;
+
   object-fit:contain;
+
   image-rendering:pixelated;
+
   pointer-events:none;
 }
-.item span{font-size:11px;font-weight:800;text-align:center}
-.ghost{
+
+.item span{
+  font-size:10px;
+  font-weight:900;
+
+  text-align:center;
+}
+
+
+/* 드래그 중 따라다니는 이미지 */
+.drag-ghost{
   position:fixed;
-  width:100px;height:100px;
-  z-index:999;
+
+  z-index:9999;
+
+  width:96px;
+  height:96px;
+
   transform:translate(-50%,-50%);
+
   pointer-events:none;
 }
-.ghost img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
-.snap{
-  position:absolute;
-  width:14%;
-  transform:translate(-50%,-50%);
-  z-index:8;
+
+.drag-ghost img{
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+
   image-rendering:pixelated;
+}
+
+
+/* 성공 후 지도에 남는 아이템 */
+.map-item{
+  position:absolute;
+
+  z-index:12;
+
+  width:14%;
+
+  transform:translate(-50%,-50%);
+
+  image-rendering:pixelated;
+
   pointer-events:none;
 }
-.backBtn{
-  display:block;
-  width:min(520px,100%);
+
+
+/* 하단 버튼 */
+.map-buttons{
+  width:100%;
+  max-width:500px;
+
   margin:12px auto 0;
-  background:var(--navy);
-  color:white;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+.map-button{
   border:0;
-  padding:12px;
-  font-weight:800;
+
+  padding:11px;
+
+  background:var(--navy);
+
+  color:white;
+
+  font-weight:900;
+
   cursor:pointer;
 }
 
-/* ===== MODAL ===== */
+
+/* =========================
+   OPTION MODAL
+========================= */
+
 .modal{
   display:none;
+
   position:fixed;
   inset:0;
-  z-index:1000;
-  background:rgba(14,45,67,.46);
+
+  z-index:10000;
+
+  padding:20px;
+
+  background:rgba(10,44,70,.45);
+
   align-items:center;
   justify-content:center;
-  padding:20px;
 }
-.modal.show{display:flex}
-.modalBox{
-  width:min(380px,100%);
-  background:#fff8df;
-  border:4px solid var(--navy);
+
+.modal.show{
+  display:flex;
+}
+
+.modal-box{
+  width:100%;
+  max-width:360px;
+
   padding:18px;
-  color:var(--navy);
+
+  background:#fff5d7;
+
+  border:4px solid var(--navy);
 }
-.modalBox h3{margin:0 0 14px}
-.optionRow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed #b9aa7d}
-.optionRow:last-of-type{border-bottom:0}
-.smallBtn{border:2px solid var(--navy);background:#f5e8b8;color:var(--navy);padding:8px 12px;font-weight:800}
-.closeBtn{margin-top:14px;width:100%;padding:10px;background:var(--navy);color:white;border:0;font-weight:800}
+
+.modal-box h2{
+  margin-bottom:12px;
+
+  color:var(--navy);
+
+  font-size:20px;
+}
+
+.option-row{
+  display:flex;
+
+  justify-content:space-between;
+  align-items:center;
+
+  padding:10px 0;
+
+  border-bottom:1px dashed #c5b78f;
+
+  font-size:13px;
+}
+
+.option-button{
+  border:2px solid var(--navy);
+
+  background:#f3e2ad;
+
+  color:var(--navy);
+
+  padding:7px 10px;
+
+  font-weight:900;
+}
+
+.modal-close{
+  margin-top:14px;
+
+  width:100%;
+
+  border:0;
+
+  background:var(--navy);
+
+  color:white;
+
+  padding:10px;
+
+  font-weight:900;
+}
+
+@media(min-width:521px){
+  #app{
+    box-shadow:0 0 35px rgba(0,0,0,.22);
+  }
+}
 </style>
 </head>
+
+
 <body>
-<div class="app">
 
-  <!-- TITLE -->
-  <section id="titleScreen">
-    <div class="cloud c1"></div>
-    <div class="cloud c2"></div>
-    <div class="cloud c3"></div>
-    <div class="gull g1">⌁</div>
-    <div class="gull g2">⌁</div>
-    <div class="gull g3">⌁</div>
-    <div class="sparkles"></div>
+<div id="app">
 
-    <div class="titleWrap">
-      <div class="logo">三海會</div>
-      <div class="eng">SAMHAEHOE</div>
-      <div class="anchorLine"><span>⚓</span></div>
+  <!-- =====================
+       TITLE
+  ====================== -->
+
+  <section id="title-screen">
+
+    <div id="touch-text">
+      - 화면을 터치하세요 -
     </div>
 
-    <div class="bottomZone">
-      <div class="tapPrompt" id="tapPrompt">- 화면을 터치하세요 -</div>
+    <nav id="title-menu">
 
-      <nav class="mainMenu" id="mainMenu" aria-label="메인 메뉴">
-        <button class="menuBtn" id="newGameBtn">새 게임</button>
-        <button class="menuBtn" id="loadBtn">불러오기</button>
-        <button class="menuBtn" id="optionBtn">옵션</button>
-      </nav>
-    </div>
+      <button class="menu-button" id="new-game">
+        새 게임
+      </button>
+
+      <button class="menu-button" id="load-game">
+        불러오기
+      </button>
+
+      <button class="menu-button" id="open-options">
+        옵션
+      </button>
+
+    </nav>
+
   </section>
 
-  <!-- GAME -->
-  <section id="gameScreen">
-    <div class="gameHead">
-      <h2>三海會</h2>
-      <p>흩어진 물건이 세 개 있다.</p>
+
+  <!-- =====================
+       MAP
+  ====================== -->
+
+  <section id="map-screen">
+
+    <header class="map-header">
+
+      <h1>三海會</h1>
+
+      <p>
+        주인을 잃은 물건이 세 개.
+        제자리로 돌려놓자.
+      </p>
+
+    </header>
+
+
+    <div class="map-wrap" id="map-wrap">
+
+      <img
+        src="assets/korea-map.png"
+        class="map-image"
+        alt="대한민국 픽셀 지도"
+      >
+
+
+      <!-- 정답 영역 -->
+
+      <div
+        class="target"
+        id="target-incheon">
+      </div>
+
+      <div
+        class="target"
+        id="target-yangyang">
+      </div>
+
+      <div
+        class="target"
+        id="target-busan">
+      </div>
+
+
+      <!-- 도시 표시 -->
+
+      <div
+        class="city"
+        id="city-incheon">
+
+        <span class="city-dot"></span>
+
+        <span class="city-name">
+          인천
+        </span>
+
+      </div>
+
+
+      <div
+        class="city"
+        id="city-yangyang">
+
+        <span class="city-dot"></span>
+
+        <span class="city-name">
+          양양
+        </span>
+
+      </div>
+
+
+      <div
+        class="city"
+        id="city-busan">
+
+        <span class="city-dot"></span>
+
+        <span class="city-name">
+          부산
+        </span>
+
+      </div>
+
     </div>
 
-    <div class="mapBox" id="mapBox">
-      <img class="map" src="assets/korea_map.png" alt="대한민국 픽셀 지도">
 
-      <div class="target" id="targetIncheon"></div>
-      <div class="target" id="targetYangyang"></div>
-      <div class="target" id="targetBusan"></div>
-
-      <div class="city" id="cityIncheon"><span class="cityDot"></span><span class="cityName">인천</span></div>
-      <div class="city" id="cityYangyang"><span class="cityDot"></span><span class="cityName">양양</span></div>
-      <div class="city" id="cityBusan"><span class="cityDot"></span><span class="cityName">부산</span></div>
+    <div id="status">
+      이런 걸 흘리고 다니는 놈들이 누구지.
     </div>
 
-    <div class="status" id="status">이런 걸 흘리고 다니는 놈들이 누구지.</div>
 
-    <div class="items">
-      <div class="item" data-key="busan" data-target="targetBusan" data-src="assets/spicy_shrimp.png">
-        <img src="assets/spicy_shrimp.png" alt="매운 새우깡">
-        <span>매운 새우깡</span>
-      </div>
-      <div class="item" data-key="incheon" data-target="targetIncheon" data-src="assets/sunglasses.png">
-        <img src="assets/sunglasses.png" alt="선글라스">
-        <span>선글라스</span>
-      </div>
-      <div class="item" data-key="yangyang" data-target="targetYangyang" data-src="assets/hawaiian_shirt.png">
-        <img src="assets/hawaiian_shirt.png" alt="하와이안 셔츠">
-        <span>하와이안 셔츠</span>
-      </div>
+    <div class="inventory-title">
+      ITEMS
     </div>
 
-    <button class="backBtn" id="backBtn">타이틀로</button>
+
+    <section class="inventory">
+
+      <div
+        class="item"
+        data-key="busan"
+        data-target="target-busan"
+        data-src="assets/spicy-shrimp.png">
+
+        <img
+          src="assets/spicy-shrimp.png"
+          alt="매운 새우깡"
+        >
+
+        <span>
+          매운 새우깡
+        </span>
+
+      </div>
+
+
+      <div
+        class="item"
+        data-key="incheon"
+        data-target="target-incheon"
+        data-src="assets/sunglasses.png">
+
+        <img
+          src="assets/sunglasses.png"
+          alt="선글라스"
+        >
+
+        <span>
+          선글라스
+        </span>
+
+      </div>
+
+
+      <div
+        class="item"
+        data-key="yangyang"
+        data-target="target-yangyang"
+        data-src="assets/hawaiian-shirt.png">
+
+        <img
+          src="assets/hawaiian-shirt.png"
+          alt="하와이안 셔츠"
+        >
+
+        <span>
+          하와이안 셔츠
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <div class="map-buttons">
+
+      <button
+        class="map-button"
+        id="back-title">
+        타이틀로
+      </button>
+
+      <button
+        class="map-button"
+        id="reset-progress">
+        처음부터
+      </button>
+
+    </div>
+
   </section>
+
 </div>
 
-<!-- OPTIONS -->
-<div class="modal" id="optionModal">
-  <div class="modalBox">
-    <h3>옵션</h3>
-    <div class="optionRow"><span>효과음</span><button class="smallBtn" id="sfxBtn">ON</button></div>
-    <div class="optionRow"><span>진행 초기화</span><button class="smallBtn" id="resetBtn">초기화</button></div>
-    <button class="closeBtn" id="closeOption">닫기</button>
+
+<!-- =====================
+     OPTIONS
+====================== -->
+
+<div
+  class="modal"
+  id="options-modal">
+
+  <div class="modal-box">
+
+    <h2>
+      옵션
+    </h2>
+
+
+    <div class="option-row">
+
+      <span>
+        효과음
+      </span>
+
+      <button
+        class="option-button"
+        id="sound-toggle">
+        ON
+      </button>
+
+    </div>
+
+
+    <div class="option-row">
+
+      <span>
+        진행 기록
+      </span>
+
+      <button
+        class="option-button"
+        id="clear-save">
+        초기화
+      </button>
+
+    </div>
+
+
+    <button
+      class="modal-close"
+      id="close-options">
+      닫기
+    </button>
+
   </div>
+
 </div>
+
 
 <script>
-(()=>{
-  const titleScreen = document.getElementById("titleScreen");
-  const tapPrompt = document.getElementById("tapPrompt");
-  const mainMenu = document.getElementById("mainMenu");
-  const gameScreen = document.getElementById("gameScreen");
-  const optionModal = document.getElementById("optionModal");
-  const status = document.getElementById("status");
-  const mapBox = document.getElementById("mapBox");
 
-  let menuOpened = false;
-  let solved = new Set(JSON.parse(localStorage.getItem("samhaehoeSolved") || "[]"));
-  let sfx = localStorage.getItem("samhaehoeSfx") !== "off";
+const titleScreen =
+  document.getElementById("title-screen");
 
-  function openMenu(){
-    if(menuOpened) return;
-    menuOpened = true;
-    tapPrompt.style.display = "none";
-    mainMenu.classList.add("show");
+const touchText =
+  document.getElementById("touch-text");
+
+const titleMenu =
+  document.getElementById("title-menu");
+
+const mapScreen =
+  document.getElementById("map-screen");
+
+const mapWrap =
+  document.getElementById("map-wrap");
+
+const statusBox =
+  document.getElementById("status");
+
+const optionsModal =
+  document.getElementById("options-modal");
+
+
+let titleOpened = false;
+
+
+/* =========================
+   SAVE DATA
+========================= */
+
+function readSave(){
+
+  try{
+
+    return new Set(
+      JSON.parse(
+        localStorage.getItem(
+          "samhaehoe-progress"
+        ) || "[]"
+      )
+    );
+
   }
 
-  titleScreen.addEventListener("pointerdown", (e)=>{
-    if(e.target.closest("button")) return;
-    openMenu();
-  });
+  catch{
 
-  function showGame(useSave=false){
-    titleScreen.style.display = "none";
-    gameScreen.classList.add("show");
+    return new Set();
 
-    if(!useSave){
-      solved = new Set();
-      localStorage.setItem("samhaehoeSolved","[]");
-    }
-    renderSolved();
   }
 
-  document.getElementById("newGameBtn").addEventListener("click", ()=>showGame(false));
-  document.getElementById("loadBtn").addEventListener("click", ()=>{
-    if(solved.size===0){
-      alert("저장된 진행 기록이 없습니다.");
+}
+
+
+let solved =
+  readSave();
+
+
+function saveProgress(){
+
+  localStorage.setItem(
+    "samhaehoe-progress",
+    JSON.stringify(
+      [...solved]
+    )
+  );
+
+}
+
+
+/* =========================
+   TITLE
+========================= */
+
+titleScreen.addEventListener(
+  "pointerup",
+  function(event){
+
+    if(
+      event.target.closest(
+        "button"
+      )
+    ){
       return;
     }
-    showGame(true);
-  });
-  document.getElementById("optionBtn").addEventListener("click", ()=>optionModal.classList.add("show"));
-  document.getElementById("closeOption").addEventListener("click", ()=>optionModal.classList.remove("show"));
 
-  const sfxBtn = document.getElementById("sfxBtn");
-  sfxBtn.textContent = sfx ? "ON" : "OFF";
-  sfxBtn.addEventListener("click", ()=>{
-    sfx=!sfx;
-    localStorage.setItem("samhaehoeSfx", sfx ? "on" : "off");
-    sfxBtn.textContent = sfx ? "ON" : "OFF";
-  });
 
-  document.getElementById("resetBtn").addEventListener("click", ()=>{
-    solved.clear();
-    localStorage.removeItem("samhaehoeSolved");
-    alert("진행 기록을 초기화했습니다.");
-  });
-
-  document.getElementById("backBtn").addEventListener("click", ()=>{
-    gameScreen.classList.remove("show");
-    titleScreen.style.display = "flex";
-  });
-
-  function saveSolved(){
-    localStorage.setItem("samhaehoeSolved", JSON.stringify([...solved]));
-  }
-
-  function renderSolved(){
-    document.querySelectorAll(".snap").forEach(el=>el.remove());
-    document.querySelectorAll(".item").forEach(item=>{
-      item.classList.toggle("done", solved.has(item.dataset.key));
-      if(solved.has(item.dataset.key)) placeSnap(item);
-    });
-  }
-
-  function placeSnap(item){
-    const target = document.getElementById(item.dataset.target);
-    const wr = mapBox.getBoundingClientRect();
-    const tr = target.getBoundingClientRect();
-    const snap = document.createElement("img");
-    snap.className = "snap";
-    snap.src = item.dataset.src;
-    snap.alt = "";
-    snap.style.left = `${((tr.left + tr.width/2 - wr.left)/wr.width)*100}%`;
-    snap.style.top = `${((tr.top + tr.height/2 - wr.top)/wr.height)*100}%`;
-    mapBox.appendChild(snap);
-  }
-
-  document.querySelectorAll(".item").forEach(item=>{
-    let ghost=null;
-    let dragging=false;
-
-    item.addEventListener("pointerdown",e=>{
-      if(item.classList.contains("done")) return;
-      dragging=true;
-      item.setPointerCapture(e.pointerId);
-      mapBox.classList.add("dragging");
-
-      ghost=document.createElement("div");
-      ghost.className="ghost";
-      ghost.innerHTML=`<img src="${item.dataset.src}" alt="">`;
-      document.body.appendChild(ghost);
-      move(e);
-    });
-
-    item.addEventListener("pointermove",e=>{
-      if(dragging&&ghost) move(e);
-    });
-
-    item.addEventListener("pointerup",e=>{
-      if(!dragging)return;
-      dragging=false;
-      mapBox.classList.remove("dragging");
-
-      const target=document.getElementById(item.dataset.target);
-      const r=target.getBoundingClientRect();
-      const cx=r.left+r.width/2;
-      const cy=r.top+r.height/2;
-      const dist=Math.hypot(e.clientX-cx,e.clientY-cy);
-      const allowed=Math.max(r.width,r.height)*1.45;
-
-      if(ghost){ghost.remove();ghost=null;}
-
-      if(dist<=allowed){
-        solved.add(item.dataset.key);
-        saveSolved();
-        item.classList.add("done");
-        placeSnap(item);
-
-        if(solved.size===3){
-          status.textContent="세 개 전부 제자리. 그런데 대체, 이런 걸 흘리고 다니는 놈들이 누구지.";
-        }else{
-          status.textContent="찾았다.";
-        }
-      }else{
-        status.textContent="이곳은 아닌 것 같다.";
-      }
-    });
-
-    item.addEventListener("pointercancel",()=>{
-      dragging=false;
-      mapBox.classList.remove("dragging");
-      if(ghost)ghost.remove();
-      ghost=null;
-    });
-
-    function move(e){
-      ghost.style.left=e.clientX+"px";
-      ghost.style.top=e.clientY+"px";
+    if(titleOpened){
+      return;
     }
-  });
-})();
+
+
+    titleOpened = true;
+
+    touchText.style.display =
+      "none";
+
+    titleMenu.classList.add(
+      "show"
+    );
+
+  }
+);
+
+
+/* =========================
+   OPEN MAP
+========================= */
+
+function openMap(
+  loadSave
+){
+
+  titleScreen.style.display =
+    "none";
+
+  mapScreen.classList.add(
+    "show"
+  );
+
+
+  if(!loadSave){
+
+    solved =
+      new Set();
+
+    saveProgress();
+
+  }
+
+
+  renderProgress();
+
+}
+
+
+/* NEW GAME */
+
+document
+.getElementById("new-game")
+.addEventListener(
+  "click",
+  function(event){
+
+    event.stopPropagation();
+
+    openMap(false);
+
+  }
+);
+
+
+/* LOAD */
+
+document
+.getElementById("load-game")
+.addEventListener(
+  "click",
+  function(event){
+
+    event.stopPropagation();
+
+
+    solved =
+      readSave();
+
+
+    if(
+      solved.size === 0
+    ){
+
+      alert(
+        "저장된 진행 기록이 없습니다."
+      );
+
+      return;
+
+    }
+
+
+    openMap(true);
+
+  }
+);
+
+
+/* TITLE BACK */
+
+document
+.getElementById("back-title")
+.addEventListener(
+  "click",
+  function(){
+
+    mapScreen.classList.remove(
+      "show"
+    );
+
+    titleScreen.style.display =
+      "block";
+
+  }
+);
+
+
+/* RESET */
+
+document
+.getElementById("reset-progress")
+.addEventListener(
+  "click",
+  function(){
+
+    solved =
+      new Set();
+
+    saveProgress();
+
+    renderProgress();
+
+    statusBox.textContent =
+      "처음부터 다시.";
+
+  }
+);
+
+
+/* =========================
+   OPTIONS
+========================= */
+
+document
+.getElementById("open-options")
+.addEventListener(
+  "click",
+  function(event){
+
+    event.stopPropagation();
+
+    optionsModal.classList.add(
+      "show"
+    );
+
+  }
+);
+
+
+document
+.getElementById("close-options")
+.addEventListener(
+  "click",
+  function(){
+
+    optionsModal.classList.remove(
+      "show"
+    );
+
+  }
+);
+
+
+let soundOn = true;
+
+
+document
+.getElementById("sound-toggle")
+.addEventListener(
+  "click",
+  function(event){
+
+    soundOn =
+      !soundOn;
+
+    event.currentTarget.textContent =
+      soundOn
+      ? "ON"
+      : "OFF";
+
+  }
+);
+
+
+document
+.getElementById("clear-save")
+.addEventListener(
+  "click",
+  function(){
+
+    solved =
+      new Set();
+
+    saveProgress();
+
+    alert(
+      "진행 기록을 초기화했습니다."
+    );
+
+  }
+);
+
+
+/* =========================
+   RENDER SOLVED ITEMS
+========================= */
+
+function renderProgress(){
+
+  document
+  .querySelectorAll(
+    ".map-item"
+  )
+  .forEach(
+    element =>
+      element.remove()
+  );
+
+
+  document
+  .querySelectorAll(
+    ".item"
+  )
+  .forEach(
+    item => {
+
+      const key =
+        item.dataset.key;
+
+
+      if(
+        solved.has(key)
+      ){
+
+        item.classList.add(
+          "done"
+        );
+
+        placeOnMap(
+          item
+        );
+
+      }
+
+      else{
+
+        item.classList.remove(
+          "done"
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================
+   PLACE ITEM ON MAP
+========================= */
+
+function placeOnMap(
+  item
+){
+
+  const target =
+    document.getElementById(
+      item.dataset.target
+    );
+
+
+  const mapRect =
+    mapWrap.getBoundingClientRect();
+
+
+  const targetRect =
+    target.getBoundingClientRect();
+
+
+  const x =
+    (
+      targetRect.left
+      + targetRect.width / 2
+      - mapRect.left
+    )
+    / mapRect.width
+    * 100;
+
+
+  const y =
+    (
+      targetRect.top
+      + targetRect.height / 2
+      - mapRect.top
+    )
+    / mapRect.height
+    * 100;
+
+
+  const image =
+    document.createElement(
+      "img"
+    );
+
+
+  image.className =
+    "map-item";
+
+
+  image.src =
+    item.dataset.src;
+
+
+  image.alt =
+    "";
+
+
+  image.style.left =
+    x + "%";
+
+
+  image.style.top =
+    y + "%";
+
+
+  mapWrap.appendChild(
+    image
+  );
+
+}
+
+
+/* =========================
+   DRAG ITEMS
+========================= */
+
+document
+.querySelectorAll(
+  ".item"
+)
+.forEach(
+  item => {
+
+    let dragging =
+      false;
+
+    let ghost =
+      null;
+
+
+    item.addEventListener(
+      "pointerdown",
+      function(event){
+
+        if(
+          item.classList.contains(
+            "done"
+          )
+        ){
+          return;
+        }
+
+
+        dragging =
+          true;
+
+
+        item.setPointerCapture(
+          event.pointerId
+        );
+
+
+        mapWrap.classList.add(
+          "dragging"
+        );
+
+
+        ghost =
+          document.createElement(
+            "div"
+          );
+
+
+        ghost.className =
+          "drag-ghost";
+
+
+        ghost.innerHTML =
+          `<img src="${item.dataset.src}" alt="">`;
+
+
+        document.body.appendChild(
+          ghost
+        );
+
+
+        moveGhost(
+          event
+        );
+
+      }
+    );
+
+
+    item.addEventListener(
+      "pointermove",
+      function(event){
+
+        if(
+          !dragging
+          || !ghost
+        ){
+          return;
+        }
+
+
+        moveGhost(
+          event
+        );
+
+      }
+    );
+
+
+    item.addEventListener(
+      "pointerup",
+      function(event){
+
+        if(
+          !dragging
+        ){
+          return;
+        }
+
+
+        dragging =
+          false;
+
+
+        mapWrap.classList.remove(
+          "dragging"
+        );
+
+
+        const target =
+          document.getElementById(
+            item.dataset.target
+          );
+
+
+        const targetRect =
+          target.getBoundingClientRect();
+
+
+        const targetX =
+          targetRect.left
+          + targetRect.width / 2;
+
+
+        const targetY =
+          targetRect.top
+          + targetRect.height / 2;
+
+
+        const distance =
+          Math.hypot(
+            event.clientX - targetX,
+            event.clientY - targetY
+          );
+
+
+        const allowedDistance =
+          Math.max(
+            targetRect.width,
+            targetRect.height
+          )
+          * 1.45;
+
+
+        if(ghost){
+
+          ghost.remove();
+
+          ghost =
+            null;
+
+        }
+
+
+        if(
+          distance
+          <= allowedDistance
+        ){
+
+          const key =
+            item.dataset.key;
+
+
+          solved.add(
+            key
+          );
+
+
+          saveProgress();
+
+
+          item.classList.add(
+            "done"
+          );
+
+
+          placeOnMap(
+            item
+          );
+
+
+          if(
+            solved.size === 3
+          ){
+
+            statusBox.textContent =
+              "세 개 전부 제자리. 그런데 대체, 이런 걸 흘리고 다니는 놈들이 누구지.";
+
+          }
+
+          else{
+
+            statusBox.textContent =
+              "찾았다.";
+
+          }
+
+        }
+
+        else{
+
+          statusBox.textContent =
+            "이곳은 아닌 것 같다.";
+
+        }
+
+      }
+    );
+
+
+    item.addEventListener(
+      "pointercancel",
+      function(){
+
+        dragging =
+          false;
+
+
+        mapWrap.classList.remove(
+          "dragging"
+        );
+
+
+        if(ghost){
+
+          ghost.remove();
+
+          ghost =
+            null;
+
+        }
+
+      }
+    );
+
+
+    function moveGhost(
+      event
+    ){
+
+      ghost.style.left =
+        event.clientX
+        + "px";
+
+
+      ghost.style.top =
+        event.clientY
+        + "px";
+
+    }
+
+  }
+);
+
 </script>
+
 </body>
 </html>
