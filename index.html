@@ -906,6 +906,7 @@ const optionsModal =
 
 
 let titleOpened = false;
+let menuLocked = false;
 
 
 /* =========================
@@ -959,21 +960,15 @@ titleScreen.addEventListener(
   "pointerup",
   function(event){
 
-    if(
-      event.target.closest(
-        "button"
-      )
-    ){
-      return;
-    }
-
-
     if(titleOpened){
       return;
     }
 
+    event.preventDefault();
+    event.stopPropagation();
 
     titleOpened = true;
+    menuLocked = true;
 
     touchText.style.display =
       "none";
@@ -981,6 +976,10 @@ titleScreen.addEventListener(
     titleMenu.classList.add(
       "show"
     );
+
+    setTimeout(function(){
+      menuLocked = false;
+    }, 400);
 
   }
 );
@@ -1027,6 +1026,8 @@ document
 
     event.stopPropagation();
 
+    if(menuLocked){ return; }
+
     openMap(false);
 
   }
@@ -1042,6 +1043,8 @@ document
   function(event){
 
     event.stopPropagation();
+
+    if(menuLocked){ return; }
 
 
     solved =
@@ -1119,6 +1122,8 @@ document
   function(event){
 
     event.stopPropagation();
+
+    if(menuLocked){ return; }
 
     optionsModal.classList.add(
       "show"
