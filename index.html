@@ -268,8 +268,8 @@ const optionsModal = document.getElementById("options-modal");
 
 let titleOpened = false;
 let menuLocked = false;
-let collected = readSet("samhaehoe-collected");
-let solved = readSet("samhaehoe-solved");
+let collected = new Set();
+let solved = new Set();
 
 const itemNames = {
   busan:"매운 새우깡",
@@ -341,13 +341,15 @@ function openMap(loadSave){
   titleScreen.style.display="none";
   mapScreen.classList.add("show");
 
-  collected=readSet("samhaehoe-collected");
-
-  if(!loadSave){
-    solved=new Set();
-    saveSet("samhaehoe-solved",solved);
-  }else{
+  if(loadSave){
+    collected=readSet("samhaehoe-collected");
     solved=readSet("samhaehoe-solved");
+  }else{
+    solved=new Set();
+
+    // 새 게임은 현재 타이틀 화면에서 직접 주운 과자만 사용
+    saveSet("samhaehoe-collected",collected);
+    saveSet("samhaehoe-solved",solved);
   }
 
   renderMap();
@@ -376,7 +378,6 @@ document.getElementById("load-game").addEventListener("click",event=>{
 document.getElementById("back-title").addEventListener("click",()=>{
   mapScreen.classList.remove("show");
   titleScreen.style.display="block";
-  collected=readSet("samhaehoe-collected");
   renderTitleSnacks();
 });
 
