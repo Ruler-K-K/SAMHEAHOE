@@ -4,1647 +4,541 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>三海會</title>
-
 <style>
 :root{
   --navy:#173b61;
-  --navy2:#0f2f4d;
-  --cream:#fff4d4;
-  --cream2:#f7e4b5;
-  --sky:#8ed5ef;
-  --sea:#258fc8;
-  --red:#df5f4f;
-  --ink:#173b61;
+  --navy2:#0e2d4b;
+  --cream:#fff3cf;
+  --muted:#bcd2d8;
+  --red:#df5e4c;
 }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100%;background:#0e5d8e;font-family:Arial,"Malgun Gothic",sans-serif;color:var(--navy)}
+button{font:inherit}
+body{display:flex;justify-content:center}
+#app{position:relative;width:100%;max-width:520px;min-height:100dvh;overflow:hidden;background:#8dd6ef}
+@media(min-width:521px){#app{box-shadow:0 0 34px rgba(0,0,0,.22)}}
 
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-html,body{
-  width:100%;
-  min-height:100%;
-  background:#0f5f91;
-  font-family:Arial,"Malgun Gothic",sans-serif;
-  color:var(--ink);
-}
-
-button{
-  font:inherit;
-}
-
-body{
-  display:flex;
-  justify-content:center;
-}
-
-#app{
-  width:100%;
-  max-width:520px;
-  min-height:100dvh;
-  background:#8ed5ef;
-  overflow:hidden;
-  position:relative;
-}
-
-/* =========================
-   1. TITLE SCREEN
-========================= */
-
+/* ================= TITLE ================= */
 #title-screen{
-  position:relative;
-  width:100%;
-  height:100dvh;
-  min-height:640px;
-
-  background-image:url("assets/title-bg.png");
-  background-size:cover;
-  background-position:center top;
-  background-repeat:no-repeat;
-
-  user-select:none;
-  -webkit-tap-highlight-color:transparent;
+  position:relative;width:100%;height:100dvh;min-height:640px;
+  background:url("assets/title-bg.png") center top / cover no-repeat;
+  user-select:none;-webkit-tap-highlight-color:transparent;overflow:hidden;
 }
-
-/* 첫 접속 때만 보이는 문구 */
 #touch-text{
-  position:absolute;
-
-  left:50%;
-  top:63%;
-
-  transform:translate(-50%,-50%);
-
-  width:100%;
-
-  text-align:center;
-
-  color:#fff5d8;
-
-  font-size:clamp(19px,5.4vw,26px);
-  font-weight:900;
-  letter-spacing:.02em;
-
-  text-shadow:
-    2px 0 var(--navy2),
-    -2px 0 var(--navy2),
-    0 2px var(--navy2),
-    0 -2px var(--navy2),
-    2px 2px var(--navy2);
-
-  animation:blink 1.05s steps(2,end) infinite;
+  position:absolute;z-index:10;left:50%;top:63%;transform:translate(-50%,-50%);
+  width:100%;text-align:center;color:#fff4d2;font-size:clamp(18px,5vw,25px);font-weight:900;
+  text-shadow:2px 0 var(--navy2),-2px 0 var(--navy2),0 2px var(--navy2),0 -2px var(--navy2),2px 2px var(--navy2);
+  animation:blink 1.05s steps(2,end) infinite;pointer-events:none;
 }
+@keyframes blink{50%{opacity:.3}}
 
-@keyframes blink{
-  50%{ opacity:.30; }
+/* 떠다니는 과자 */
+.float-snack{
+  position:absolute;z-index:12;width:72px;height:72px;
+  border:0;background:transparent;padding:0;cursor:pointer;touch-action:manipulation;
+  filter:drop-shadow(2px 3px 0 rgba(15,47,77,.24));
+  animation:floaty 2.6s ease-in-out infinite;
 }
+.float-snack img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;pointer-events:none}
+.float-snack[data-key="busan"]{left:9%;top:55%;animation-delay:-.4s}
+.float-snack[data-key="incheon"]{right:8%;top:61%;animation-delay:-1.2s}
+.float-snack[data-key="yangyang"]{left:42%;top:76%;animation-delay:-1.8s}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-9px) rotate(2deg)}}
+.float-snack.collected{display:none}
 
+/* 타이틀 시스템 메시지 */
+#pickup-toast{
+  position:absolute;z-index:30;left:50%;bottom:10%;transform:translateX(-50%);
+  width:82%;padding:10px 12px;text-align:center;color:#fff3cf;background:rgba(14,45,75,.94);
+  border:2px solid #fff0c0;box-shadow:inset 0 0 0 2px #315c78;
+  font-size:12px;font-weight:800;opacity:0;pointer-events:none;
+}
+#pickup-toast.show{animation:toast 1.55s ease forwards}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,8px)}15%,75%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
 
-/* =========================
-   2. TITLE MENU - RPG STYLE
-========================= */
-
+/* RPG 메뉴 */
 #title-menu{
-  display:none;
-
-  position:absolute;
-  left:50%;
-  top:69%;
-
-  transform:translate(-50%,-50%);
-
-  width:72%;
-  max-width:320px;
-
-  padding:16px 18px;
-
-  /* 쯔꾸르식 청남색 메뉴창 */
-  background:rgba(18, 48, 78, 0.92);
-
-  /* 바깥 테두리 */
+  display:none;position:absolute;z-index:20;left:50%;top:69%;transform:translate(-50%,-50%);
+  width:72%;max-width:320px;padding:16px 18px;background:rgba(18,48,78,.93);
   border:3px solid #fff1c5;
-
-  /* 안쪽 테두리 + 그림자 */
-  box-shadow:
-    inset 0 0 0 3px #315f7c,
-    inset 0 0 0 5px #102e4a,
-    4px 5px 0 rgba(10,30,45,.25);
-
-  image-rendering:pixelated;
+  box-shadow:inset 0 0 0 3px #315f7c,inset 0 0 0 5px #102e4a,4px 5px 0 rgba(10,30,45,.25);
 }
-
-#title-menu.show{
-  display:block;
-  animation:menuIn .18s ease-out;
-}
-
-@keyframes menuIn{
-  from{
-    opacity:0;
-    transform:translate(-50%,-46%);
-  }
-
-  to{
-    opacity:1;
-    transform:translate(-50%,-50%);
-  }
-}
-
-
-/* 메뉴 한 줄 */
-
+#title-menu.show{display:block;animation:menuIn .18s ease-out}
+@keyframes menuIn{from{opacity:0;transform:translate(-50%,-46%)}to{opacity:1;transform:translate(-50%,-50%)}}
 .menu-button{
-  position:relative;
-
-  display:block;
-  width:100%;
-
-  border:0;
-  background:transparent;
-
-  padding:12px 10px 12px 45px;
-
-  color:#c9d9dc;
-
-  font-size:18px;
-  font-weight:900;
-
-  text-align:left;
-
-  text-shadow:
-    2px 0 #0b263d,
-    -2px 0 #0b263d,
-    0 2px #0b263d,
-    0 -2px #0b263d;
-
-  cursor:pointer;
-
-  -webkit-tap-highlight-color:transparent;
+  position:relative;display:block;width:100%;border:0;background:transparent;
+  padding:12px 10px 12px 45px;color:#c9d9dc;font-size:18px;font-weight:900;text-align:left;cursor:pointer;
+  text-shadow:2px 0 #0b263d,-2px 0 #0b263d,0 2px #0b263d,0 -2px #0b263d;
 }
-
-
-/* 선택 커서 */
-
 .menu-button::before{
-  content:"▶";
-
-  position:absolute;
-
-  left:15px;
-  top:50%;
-
-  transform:translateY(-50%);
-
-  color:#ffd96a;
-
-  opacity:0;
-
-  text-shadow:
-    2px 0 #102c45,
-    -2px 0 #102c45,
-    0 2px #102c45,
-    0 -2px #102c45;
+  content:"▶";position:absolute;left:15px;top:50%;transform:translateY(-50%);
+  color:#ffd96a;opacity:0;text-shadow:2px 0 #102c45,-2px 0 #102c45,0 2px #102c45,0 -2px #102c45;
 }
+.menu-button:hover,.menu-button:focus,.menu-button:active{color:#fff4c9;outline:none}
+.menu-button:hover::before,.menu-button:focus::before,.menu-button:active::before{opacity:1;animation:cursorBlink .65s steps(2,end) infinite}
+#new-game{color:#fff4c9}
+#new-game::before{opacity:1;animation:cursorBlink .65s steps(2,end) infinite}
+@keyframes cursorBlink{50%{opacity:.25}}
 
-
-/* 선택된 메뉴 */
-
-.menu-button:hover,
-.menu-button:focus,
-.menu-button:active{
-  color:#fff4c9;
-  outline:none;
-}
-
-.menu-button:hover::before,
-.menu-button:focus::before,
-.menu-button:active::before{
-  opacity:1;
-
-  animation:cursorBlink .65s steps(2,end) infinite;
-}
-
-
-/* 첫 번째 새 게임은 기본 선택처럼 표시 */
-
-#new-game{
-  color:#fff4c9;
-}
-
-#new-game::before{
-  opacity:1;
-
-  animation:cursorBlink .65s steps(2,end) infinite;
-}
-
-
-@keyframes cursorBlink{
-  50%{
-    opacity:.25;
-  }
-}
-/* =========================
-   3. MAP GAME SCREEN
-========================= */
-
+/* ================= MAP ================= */
 #map-screen{
-  display:none;
-
-  min-height:100dvh;
-
-  padding:
-    calc(14px + env(safe-area-inset-top))
-    12px
-    calc(22px + env(safe-area-inset-bottom));
-
-  background:
-    linear-gradient(
-      #aee5f3 0%,
-      #dff3ed 48%,
-      #fff0c8 100%
-    );
+  display:none;min-height:100dvh;padding:12px 10px 24px;
+  background:linear-gradient(#b6e6f0 0%,#e3f1e7 48%,#fff1c9 100%);
 }
-
-#map-screen.show{
-  display:block;
+#map-screen.show{display:block}
+.map-head{text-align:center;margin-bottom:8px}
+.map-logo{
+  font-family:Georgia,"Times New Roman",serif;font-size:37px;font-weight:900;letter-spacing:.04em;
+  color:var(--navy);text-shadow:2px 0 #fff3cf,-2px 0 #fff3cf,0 2px #fff3cf,0 -2px #fff3cf;
 }
-
-.map-header{
-  text-align:center;
-  margin-bottom:10px;
-}
-
-.map-header h1{
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:32px;
-  color:var(--navy);
-}
-
-.map-header p{
-  margin-top:4px;
-  font-size:13px;
-  color:#4f6a76;
-}
-
-/* 지도 */
+.map-sub{margin-top:3px;font-size:12px;letter-spacing:.18em;font-weight:800;color:#4e7180}
 .map-wrap{
-  position:relative;
-
-  width:100%;
-  max-width:500px;
-
-  margin:0 auto;
-
-  border:3px solid var(--navy);
-  background:#87d0e4;
-
-  overflow:hidden;
+  position:relative;width:100%;max-width:500px;margin:0 auto;border:3px solid var(--navy);
+  background:#80cde2;overflow:hidden;box-shadow:0 4px 0 rgba(19,59,97,.14)
 }
+.map-image{display:block;width:100%;height:auto;image-rendering:pixelated}
 
-.map-image{
-  display:block;
-
-  width:100%;
-  height:auto;
-
-  image-rendering:pixelated;
-}
-
-/* 도시 라벨 */
+/* 도시 */
 .city{
-  position:absolute;
-  z-index:10;
-
-  transform:translate(-50%,-50%);
-
-  display:flex;
-  align-items:center;
-  gap:5px;
-
+  position:absolute;z-index:10;transform:translate(-50%,-50%);
+  display:flex;align-items:center;gap:4px;color:#fff4d5;font-size:16px;font-weight:900;
+  text-shadow:2px 0 var(--navy),-2px 0 var(--navy),0 2px var(--navy),0 -2px var(--navy),2px 2px var(--navy);
   pointer-events:none;
 }
+.city::before{content:"●";color:#e75243}
+#city-incheon{left:28%;top:23%}
+#city-yangyang{left:71%;top:14%}
+#city-busan{left:74%;top:65%}
+.city.unlocked{pointer-events:auto;cursor:pointer;animation:cityPulse 1.2s ease-in-out infinite}
+@keyframes cityPulse{50%{transform:translate(-50%,-50%) scale(1.08)}}
 
-.city-dot{
-  width:13px;
-  height:13px;
-
-  border-radius:50%;
-
-  background:#e74d40;
-
-  border:3px solid #fff3cf;
-
-  box-shadow:0 0 0 2px var(--navy);
-}
-
-.city-name{
-  color:#fff7d7;
-
-  font-size:16px;
-  font-weight:900;
-
-  text-shadow:
-    2px 0 var(--navy),
-    -2px 0 var(--navy),
-    0 2px var(--navy),
-    0 -2px var(--navy),
-    2px 2px var(--navy);
-}
-
-/*
-  좌표는 %라서 모바일 크기가 바뀌어도
-  지도 이미지에 붙어서 움직임.
-*/
-
-#city-incheon{
-  left:28%;
-  top:23%;
-}
-
-#city-yangyang{
-  left:71%;
-  top:14%;
-}
-
-#city-busan{
-  left:74%;
-  top:65%;
-}
-
-
-/* 드래그 판정용 영역 */
 .target{
-  position:absolute;
-
-  z-index:9;
-
-  transform:translate(-50%,-50%);
-
-  width:17%;
-  aspect-ratio:1;
-
-  border:3px dashed rgba(255,255,255,.95);
-  border-radius:50%;
-
-  background:rgba(255,217,90,.16);
-
-  opacity:0;
-
-  pointer-events:none;
+  position:absolute;z-index:8;transform:translate(-50%,-50%);
+  width:17%;aspect-ratio:1;border:3px dashed rgba(255,255,255,.92);border-radius:50%;
+  background:rgba(255,217,90,.13);opacity:0;pointer-events:none;
 }
+.map-wrap.dragging .target{opacity:.8}
+#target-incheon{left:28%;top:23%}
+#target-yangyang{left:71%;top:14%}
+#target-busan{left:74%;top:65%}
 
-.map-wrap.dragging .target{
-  opacity:.85;
-  animation:targetBlink .65s steps(2,end) infinite;
-}
-
-@keyframes targetBlink{
-  50%{opacity:.28}
-}
-
-#target-incheon{
-  left:28%;
-  top:23%;
-}
-
-#target-yangyang{
-  left:71%;
-  top:14%;
-}
-
-#target-busan{
-  left:74%;
-  top:65%;
-}
-
-
-/* 상태창 */
 #status{
-  width:100%;
-  max-width:500px;
-
-  margin:10px auto 8px;
-
-  padding:11px 13px;
-
-  border:3px solid var(--navy);
-
-  background:#fff6d9;
-
-  font-size:13px;
-  line-height:1.55;
+  width:100%;max-width:500px;margin:9px auto 8px;padding:11px 13px;
+  border:3px solid var(--navy);background:rgba(255,246,216,.96);
+  font-size:13px;line-height:1.55;font-weight:700;
 }
-
-
-/* 아이템 */
-.inventory-title{
-  width:100%;
-  max-width:500px;
-
-  margin:10px auto 5px;
-
-  font-size:12px;
-  font-weight:900;
-
-  color:var(--navy);
-}
-
-.inventory{
-  width:100%;
-  max-width:500px;
-
-  margin:0 auto;
-
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:7px;
-}
-
+.inventory-title{width:100%;max-width:500px;margin:9px auto 5px;font-size:11px;font-weight:900;letter-spacing:.15em}
+.inventory{width:100%;max-width:500px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
 .item{
-  min-height:116px;
-
-  border:3px solid #718b89;
-
-  background:#fff6d9;
-
-  display:flex;
-  flex-direction:column;
-
-  align-items:center;
-  justify-content:center;
-
-  gap:5px;
-
-  padding:7px 4px;
-
-  cursor:grab;
-
-  user-select:none;
-  touch-action:none;
+  min-height:112px;border:3px solid #718a88;background:#fff6d9;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  padding:6px 3px;cursor:grab;user-select:none;touch-action:none;
 }
-
-.item:active{
-  cursor:grabbing;
-}
-
-.item.done{
-  opacity:.32;
-  pointer-events:none;
-}
-
-.item img{
-  width:72px;
-  height:72px;
-
-  object-fit:contain;
-
-  image-rendering:pixelated;
-
-  pointer-events:none;
-}
-
-.item span{
-  font-size:10px;
-  font-weight:900;
-
-  text-align:center;
-}
-
-
-/* 드래그 중 따라다니는 이미지 */
+.item.empty{opacity:.28;filter:grayscale(1);pointer-events:none}
+.item.done{opacity:.33;pointer-events:none}
+.item img{width:70px;height:70px;object-fit:contain;image-rendering:pixelated;pointer-events:none}
+.item span{font-size:10px;font-weight:900;text-align:center}
+.item small{font-size:9px;color:#75807d}
 .drag-ghost{
-  position:fixed;
-
-  z-index:9999;
-
-  width:96px;
-  height:96px;
-
-  transform:translate(-50%,-50%);
-
-  pointer-events:none;
+  position:fixed;z-index:9999;width:96px;height:96px;transform:translate(-50%,-50%);pointer-events:none;
 }
-
-.drag-ghost img{
-  width:100%;
-  height:100%;
-
-  object-fit:contain;
-
-  image-rendering:pixelated;
-}
-
-
-/* 성공 후 지도에 남는 아이템 */
+.drag-ghost img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 .map-item{
-  position:absolute;
-
-  z-index:12;
-
-  width:14%;
-
-  transform:translate(-50%,-50%);
-
-  image-rendering:pixelated;
-
-  pointer-events:none;
+  position:absolute;z-index:12;width:14%;transform:translate(-50%,-50%);image-rendering:pixelated;pointer-events:none;
+}
+.map-actions{width:100%;max-width:500px;margin:11px auto 0;display:flex;justify-content:flex-start}
+.back-button{
+  border:0;background:var(--navy);color:#fff3cf;padding:9px 13px;font-size:11px;font-weight:900;cursor:pointer;
 }
 
-
-/* 하단 버튼 */
-.map-buttons{
-  width:100%;
-  max-width:500px;
-
-  margin:12px auto 0;
-
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
+/* 완료 팝업 */
+#complete-box{
+  display:none;position:absolute;z-index:40;left:50%;top:49%;transform:translate(-50%,-50%);
+  width:78%;padding:19px 14px;background:rgba(18,48,78,.96);border:3px solid #fff1c5;
+  box-shadow:inset 0 0 0 3px #315f7c,inset 0 0 0 5px #102e4a;
+  color:#fff4cf;text-align:center;font-weight:900;font-size:13px;line-height:1.7;
 }
+#complete-box.show{display:block}
+#complete-box strong{display:block;font-size:18px;margin-bottom:4px}
 
-.map-button{
-  border:0;
-
-  padding:11px;
-
-  background:var(--navy);
-
-  color:white;
-
-  font-weight:900;
-
-  cursor:pointer;
-}
-
-
-/* =========================
-   OPTION MODAL
-========================= */
-
-.modal{
-  display:none;
-
-  position:fixed;
-  inset:0;
-
-  z-index:10000;
-
-  padding:20px;
-
-  background:rgba(10,44,70,.45);
-
-  align-items:center;
-  justify-content:center;
-}
-
-.modal.show{
-  display:flex;
-}
-
-.modal-box{
-  width:100%;
-  max-width:360px;
-
-  padding:18px;
-
-  background:#fff5d7;
-
-  border:4px solid var(--navy);
-}
-
-.modal-box h2{
-  margin-bottom:12px;
-
-  color:var(--navy);
-
-  font-size:20px;
-}
-
-.option-row{
-  display:flex;
-
-  justify-content:space-between;
-  align-items:center;
-
-  padding:10px 0;
-
-  border-bottom:1px dashed #c5b78f;
-
-  font-size:13px;
-}
-
-.option-button{
-  border:2px solid var(--navy);
-
-  background:#f3e2ad;
-
-  color:var(--navy);
-
-  padding:7px 10px;
-
-  font-weight:900;
-}
-
-.modal-close{
-  margin-top:14px;
-
-  width:100%;
-
-  border:0;
-
-  background:var(--navy);
-
-  color:white;
-
-  padding:10px;
-
-  font-weight:900;
-}
-
-@media(min-width:521px){
-  #app{
-    box-shadow:0 0 35px rgba(0,0,0,.22);
-  }
-}
+/* 옵션 */
+.modal{display:none;position:fixed;inset:0;z-index:10000;background:rgba(10,44,70,.48);align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex}
+.modal-box{width:100%;max-width:340px;background:#fff5d7;border:4px solid var(--navy);padding:17px}
+.modal-box h2{margin-bottom:10px;font-size:19px}
+.option-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed #c5b78f;font-size:12px}
+.option-button{border:2px solid var(--navy);background:#f3e2ad;color:var(--navy);padding:7px 10px;font-weight:900}
+.close-option{width:100%;margin-top:13px;border:0;background:var(--navy);color:white;padding:9px;font-weight:900}
 </style>
 </head>
-
-
 <body>
-
 <div id="app">
 
-  <!-- =====================
-       TITLE
-  ====================== -->
+<section id="title-screen">
+  <!-- 처음부터 바다에 떠다니는 과자 -->
+  <button class="float-snack" data-key="busan" aria-label="매운 새우깡 줍기">
+    <img src="assets/spicy-shrimp.png" alt="매운 새우깡">
+  </button>
+  <button class="float-snack" data-key="incheon" aria-label="자갈치 줍기">
+    <img src="assets/jagalchi.png" alt="자갈치">
+  </button>
+  <button class="float-snack" data-key="yangyang" aria-label="포스틱 줍기">
+    <img src="assets/postick.png" alt="포스틱">
+  </button>
 
-  <section id="title-screen">
+  <div id="touch-text">- 화면을 터치하세요 -</div>
+  <div id="pickup-toast"></div>
 
-    <div id="touch-text">
-      - 화면을 터치하세요 -
+  <nav id="title-menu">
+    <button class="menu-button" id="new-game">새 게임</button>
+    <button class="menu-button" id="load-game">불러오기</button>
+    <button class="menu-button" id="open-options">옵션</button>
+  </nav>
+</section>
+
+<section id="map-screen">
+  <header class="map-head">
+    <div class="map-logo">三海會</div>
+    <div class="map-sub">SAMHAEHOE</div>
+  </header>
+
+  <div class="map-wrap" id="map-wrap">
+    <img src="assets/korea-map.png" class="map-image" alt="대한민국 픽셀 지도">
+
+    <div class="target" id="target-incheon"></div>
+    <div class="target" id="target-yangyang"></div>
+    <div class="target" id="target-busan"></div>
+
+    <div class="city" id="city-incheon" data-page="jiwon">인천</div>
+    <div class="city" id="city-yangyang" data-page="mueun">양양</div>
+    <div class="city" id="city-busan" data-page="minsu">부산</div>
+
+    <div id="complete-box">
+      <strong>전부 맞췄다.</strong>
+      이제 지역을 눌러보자.
     </div>
-
-    <nav id="title-menu">
-
-      <button class="menu-button" id="new-game">
-        새 게임
-      </button>
-
-      <button class="menu-button" id="load-game">
-        불러오기
-      </button>
-
-      <button class="menu-button" id="open-options">
-        옵션
-      </button>
-
-    </nav>
-
-  </section>
-
-
-  <!-- =====================
-       MAP
-  ====================== -->
-
-  <section id="map-screen">
-
-    <header class="map-header">
-
-      <h1>三海會</h1>
-
-      <p>
-        주인을 잃은 물건이 세 개.
-        제자리로 돌려놓자.
-      </p>
-
-    </header>
-
-
-    <div class="map-wrap" id="map-wrap">
-
-      <img
-        src="assets/korea-map.png"
-        class="map-image"
-        alt="대한민국 픽셀 지도"
-      >
-
-
-      <!-- 정답 영역 -->
-
-      <div
-        class="target"
-        id="target-incheon">
-      </div>
-
-      <div
-        class="target"
-        id="target-yangyang">
-      </div>
-
-      <div
-        class="target"
-        id="target-busan">
-      </div>
-
-
-      <!-- 도시 표시 -->
-
-      <div
-        class="city"
-        id="city-incheon">
-
-        <span class="city-dot"></span>
-
-        <span class="city-name">
-          인천
-        </span>
-
-      </div>
-
-
-      <div
-        class="city"
-        id="city-yangyang">
-
-        <span class="city-dot"></span>
-
-        <span class="city-name">
-          양양
-        </span>
-
-      </div>
-
-
-      <div
-        class="city"
-        id="city-busan">
-
-        <span class="city-dot"></span>
-
-        <span class="city-name">
-          부산
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <div id="status">
-      이런 걸 흘리고 다니는 놈들이 누구지.
-    </div>
-
-
-    <div class="inventory-title">
-      ITEMS
-    </div>
-
-
-    <section class="inventory">
-
-      <div
-        class="item"
-        data-key="busan"
-        data-target="target-busan"
-        data-src="assets/spicy-shrimp.png">
-
-        <img
-          src="assets/spicy-shrimp.png"
-          alt="매운 새우깡"
-        >
-
-        <span>
-          매운 새우깡
-        </span>
-
-      </div>
-
-
-      <div
-        class="item"
-        data-key="incheon"
-        data-target="target-incheon"
-        data-src="assets/sunglasses.png">
-
-        <img
-          src="assets/sunglasses.png"
-          alt="선글라스"
-        >
-
-        <span>
-          선글라스
-        </span>
-
-      </div>
-
-
-      <div
-        class="item"
-        data-key="yangyang"
-        data-target="target-yangyang"
-        data-src="assets/hawaiian-shirt.png">
-
-        <img
-          src="assets/hawaiian-shirt.png"
-          alt="하와이안 셔츠"
-        >
-
-        <span>
-          하와이안 셔츠
-        </span>
-
-      </div>
-
-    </section>
-
-
-    <div class="map-buttons">
-
-      <button
-        class="map-button"
-        id="back-title">
-        타이틀로
-      </button>
-
-      <button
-        class="map-button"
-        id="reset-progress">
-        처음부터
-      </button>
-
-    </div>
-
-  </section>
-
-</div>
-
-
-<!-- =====================
-     OPTIONS
-====================== -->
-
-<div
-  class="modal"
-  id="options-modal">
-
-  <div class="modal-box">
-
-    <h2>
-      옵션
-    </h2>
-
-
-    <div class="option-row">
-
-      <span>
-        효과음
-      </span>
-
-      <button
-        class="option-button"
-        id="sound-toggle">
-        ON
-      </button>
-
-    </div>
-
-
-    <div class="option-row">
-
-      <span>
-        진행 기록
-      </span>
-
-      <button
-        class="option-button"
-        id="clear-save">
-        초기화
-      </button>
-
-    </div>
-
-
-    <button
-      class="modal-close"
-      id="close-options">
-      닫기
-    </button>
-
   </div>
 
+  <div id="status">가져온 것부터 확인해보자.</div>
+
+  <div class="inventory-title">LOST &amp; FOUND</div>
+
+  <section class="inventory">
+    <div class="item" data-key="busan" data-target="target-busan" data-src="assets/spicy-shrimp.png">
+      <img src="assets/spicy-shrimp.png" alt="매운 새우깡">
+      <span>매운 새우깡</span><small>???</small>
+    </div>
+    <div class="item" data-key="incheon" data-target="target-incheon" data-src="assets/jagalchi.png">
+      <img src="assets/jagalchi.png" alt="자갈치">
+      <span>자갈치</span><small>???</small>
+    </div>
+    <div class="item" data-key="yangyang" data-target="target-yangyang" data-src="assets/postick.png">
+      <img src="assets/postick.png" alt="포스틱">
+      <span>포스틱</span><small>???</small>
+    </div>
+  </section>
+
+  <div class="map-actions">
+    <button class="back-button" id="back-title">◀ 타이틀로</button>
+  </div>
+</section>
+
 </div>
 
+<div class="modal" id="options-modal">
+  <div class="modal-box">
+    <h2>옵션</h2>
+    <div class="option-row"><span>효과음</span><button class="option-button" id="sound-toggle">ON</button></div>
+    <div class="option-row"><span>진행 기록</span><button class="option-button" id="clear-save">초기화</button></div>
+    <button class="close-option" id="close-options">닫기</button>
+  </div>
+</div>
 
 <script>
-
-const titleScreen =
-  document.getElementById("title-screen");
-
-const touchText =
-  document.getElementById("touch-text");
-
-const titleMenu =
-  document.getElementById("title-menu");
-
-const mapScreen =
-  document.getElementById("map-screen");
-
-const mapWrap =
-  document.getElementById("map-wrap");
-
-const statusBox =
-  document.getElementById("status");
-
-const optionsModal =
-  document.getElementById("options-modal");
-
+const titleScreen = document.getElementById("title-screen");
+const touchText = document.getElementById("touch-text");
+const titleMenu = document.getElementById("title-menu");
+const mapScreen = document.getElementById("map-screen");
+const mapWrap = document.getElementById("map-wrap");
+const statusBox = document.getElementById("status");
+const pickupToast = document.getElementById("pickup-toast");
+const completeBox = document.getElementById("complete-box");
+const optionsModal = document.getElementById("options-modal");
 
 let titleOpened = false;
 let menuLocked = false;
+let collected = readSet("samhaehoe-collected");
+let solved = readSet("samhaehoe-solved");
 
+const itemNames = {
+  busan:"매운 새우깡",
+  incheon:"자갈치",
+  yangyang:"포스틱"
+};
 
-/* =========================
-   SAVE DATA
-========================= */
-
-function readSave(){
-
+function readSet(key){
   try{
-
-    return new Set(
-      JSON.parse(
-        localStorage.getItem(
-          "samhaehoe-progress"
-        ) || "[]"
-      )
-    );
-
-  }
-
-  catch{
-
+    return new Set(JSON.parse(localStorage.getItem(key) || "[]"));
+  }catch{
     return new Set();
-
   }
-
+}
+function saveSet(key,set){
+  localStorage.setItem(key,JSON.stringify([...set]));
+}
+function showToast(text){
+  pickupToast.textContent=text;
+  pickupToast.classList.remove("show");
+  void pickupToast.offsetWidth;
+  pickupToast.classList.add("show");
+}
+function renderTitleSnacks(){
+  document.querySelectorAll(".float-snack").forEach(btn=>{
+    btn.classList.toggle("collected",collected.has(btn.dataset.key));
+  });
 }
 
-
-let solved =
-  readSave();
-
-
-function saveProgress(){
-
-  localStorage.setItem(
-    "samhaehoe-progress",
-    JSON.stringify(
-      [...solved]
-    )
-  );
-
-}
-
-
-/* =========================
-   TITLE
-========================= */
-
-titleScreen.addEventListener(
-  "pointerup",
-  function(event){
-
-    if(titleOpened){
-      return;
-    }
-
+/* 과자 줍기 */
+document.querySelectorAll(".float-snack").forEach(btn=>{
+  btn.addEventListener("pointerup",event=>{
     event.preventDefault();
     event.stopPropagation();
 
-    titleOpened = true;
-    menuLocked = true;
+    const key=btn.dataset.key;
+    if(collected.has(key)) return;
 
-    touchText.style.display =
-      "none";
+    collected.add(key);
+    saveSet("samhaehoe-collected",collected);
+    renderTitleSnacks();
 
-    titleMenu.classList.add(
-      "show"
-    );
+    if(collected.size===3){
+      showToast("[전부 챙겼다.]");
+    }else{
+      showToast(`[${itemNames[key]}을(를) 주웠다.]`);
+    }
+  });
+});
 
-    setTimeout(function(){
-      menuLocked = false;
-    }, 400);
+/* 첫 터치 -> 메뉴만 열기 */
+titleScreen.addEventListener("pointerup",event=>{
+  if(event.target.closest(".float-snack") || event.target.closest("button")) return;
+  if(titleOpened) return;
 
-  }
-);
+  event.preventDefault();
+  event.stopPropagation();
 
+  titleOpened=true;
+  menuLocked=true;
+  touchText.style.display="none";
+  titleMenu.classList.add("show");
 
-/* =========================
-   OPEN MAP
-========================= */
+  setTimeout(()=>{menuLocked=false},400);
+});
 
-function openMap(
-  loadSave
-){
+/* 지도 진입 */
+function openMap(loadSave){
+  titleScreen.style.display="none";
+  mapScreen.classList.add("show");
 
-  titleScreen.style.display =
-    "none";
-
-  mapScreen.classList.add(
-    "show"
-  );
-
+  collected=readSet("samhaehoe-collected");
 
   if(!loadSave){
-
-    solved =
-      new Set();
-
-    saveProgress();
-
+    solved=new Set();
+    saveSet("samhaehoe-solved",solved);
+  }else{
+    solved=readSet("samhaehoe-solved");
   }
 
-
-  renderProgress();
-
+  renderMap();
 }
 
+document.getElementById("new-game").addEventListener("click",event=>{
+  event.stopPropagation();
+  if(menuLocked) return;
+  openMap(false);
+});
 
-/* NEW GAME */
+document.getElementById("load-game").addEventListener("click",event=>{
+  event.stopPropagation();
+  if(menuLocked) return;
 
-document
-.getElementById("new-game")
-.addEventListener(
-  "click",
-  function(event){
+  const savedSolved=readSet("samhaehoe-solved");
+  const savedCollected=readSet("samhaehoe-collected");
 
-    event.stopPropagation();
-
-    if(menuLocked){ return; }
-
-    openMap(false);
-
+  if(savedSolved.size===0 && savedCollected.size===0){
+    alert("저장된 진행 기록이 없습니다.");
+    return;
   }
-);
+  openMap(true);
+});
 
+document.getElementById("back-title").addEventListener("click",()=>{
+  mapScreen.classList.remove("show");
+  titleScreen.style.display="block";
+  collected=readSet("samhaehoe-collected");
+  renderTitleSnacks();
+});
 
-/* LOAD */
+/* 지도 렌더 */
+function renderMap(){
+  document.querySelectorAll(".map-item").forEach(el=>el.remove());
 
-document
-.getElementById("load-game")
-.addEventListener(
-  "click",
-  function(event){
+  document.querySelectorAll(".item").forEach(item=>{
+    const key=item.dataset.key;
+    const has=collected.has(key);
+    const done=solved.has(key);
 
-    event.stopPropagation();
+    item.classList.toggle("empty",!has);
+    item.classList.toggle("done",done);
 
-    if(menuLocked){ return; }
+    const owner=item.querySelector("small");
+    owner.textContent=done ? ownerName(key) : (has ? "???" : "미획득");
 
+    if(done) placeOnMap(item);
+  });
 
-    solved =
-      readSave();
+  const allDone=solved.size===3;
+  document.querySelectorAll(".city").forEach(city=>{
+    city.classList.toggle("unlocked",allDone);
+  });
 
+  if(allDone){
+    statusBox.textContent="전부 맞췄다. 지역을 눌러보자.";
+  }else if(collected.size===0){
+    statusBox.textContent="가진 게 없다.";
+  }else{
+    statusBox.textContent="가져온 것부터 확인해보자.";
+  }
+}
 
-    if(
-      solved.size === 0
-    ){
+function ownerName(key){
+  if(key==="busan") return "제갈민수";
+  if(key==="incheon") return "구지원";
+  if(key==="yangyang") return "갈무은";
+  return "???";
+}
 
-      alert(
-        "저장된 진행 기록이 없습니다."
-      );
+function placeOnMap(item){
+  const target=document.getElementById(item.dataset.target);
+  const mr=mapWrap.getBoundingClientRect();
+  const tr=target.getBoundingClientRect();
 
-      return;
+  const img=document.createElement("img");
+  img.className="map-item";
+  img.src=item.dataset.src;
+  img.alt="";
+  img.style.left=((tr.left+tr.width/2-mr.left)/mr.width*100)+"%";
+  img.style.top=((tr.top+tr.height/2-mr.top)/mr.height*100)+"%";
+  mapWrap.appendChild(img);
+}
 
+/* 드래그 */
+document.querySelectorAll(".item").forEach(item=>{
+  let dragging=false;
+  let ghost=null;
+
+  item.addEventListener("pointerdown",event=>{
+    if(item.classList.contains("empty") || item.classList.contains("done")) return;
+
+    dragging=true;
+    item.setPointerCapture(event.pointerId);
+    mapWrap.classList.add("dragging");
+
+    ghost=document.createElement("div");
+    ghost.className="drag-ghost";
+    ghost.innerHTML=`<img src="${item.dataset.src}" alt="">`;
+    document.body.appendChild(ghost);
+    moveGhost(event);
+  });
+
+  item.addEventListener("pointermove",event=>{
+    if(dragging && ghost) moveGhost(event);
+  });
+
+  item.addEventListener("pointerup",event=>{
+    if(!dragging) return;
+    dragging=false;
+    mapWrap.classList.remove("dragging");
+
+    const target=document.getElementById(item.dataset.target);
+    const tr=target.getBoundingClientRect();
+    const cx=tr.left+tr.width/2;
+    const cy=tr.top+tr.height/2;
+    const dist=Math.hypot(event.clientX-cx,event.clientY-cy);
+    const allowed=Math.max(tr.width,tr.height)*1.45;
+
+    if(ghost){ghost.remove();ghost=null;}
+
+    if(dist<=allowed){
+      solved.add(item.dataset.key);
+      saveSet("samhaehoe-solved",solved);
+      renderMap();
+
+      if(solved.size===3){
+        statusBox.textContent="전부 맞췄다.";
+        completeBox.classList.add("show");
+        setTimeout(()=>completeBox.classList.remove("show"),1700);
+      }else{
+        statusBox.textContent="여기 맞네.";
+      }
+    }else{
+      statusBox.textContent="아닌데.";
     }
+  });
 
+  item.addEventListener("pointercancel",()=>{
+    dragging=false;
+    mapWrap.classList.remove("dragging");
+    if(ghost){ghost.remove();ghost=null;}
+  });
 
-    openMap(true);
-
+  function moveGhost(event){
+    ghost.style.left=event.clientX+"px";
+    ghost.style.top=event.clientY+"px";
   }
-);
+});
 
+/* 전부 맞춘 뒤 도시 클릭 */
+document.querySelectorAll(".city").forEach(city=>{
+  city.addEventListener("click",()=>{
+    if(solved.size!==3) return;
 
-/* TITLE BACK */
-
-document
-.getElementById("back-title")
-.addEventListener(
-  "click",
-  function(){
-
-    mapScreen.classList.remove(
-      "show"
-    );
-
-    titleScreen.style.display =
-      "block";
-
-  }
-);
-
-
-/* RESET */
-
-document
-.getElementById("reset-progress")
-.addEventListener(
-  "click",
-  function(){
-
-    solved =
-      new Set();
-
-    saveProgress();
-
-    renderProgress();
-
-    statusBox.textContent =
-      "처음부터 다시.";
-
-  }
-);
-
-
-/* =========================
-   OPTIONS
-========================= */
-
-document
-.getElementById("open-options")
-.addEventListener(
-  "click",
-  function(event){
-
-    event.stopPropagation();
-
-    if(menuLocked){ return; }
-
-    optionsModal.classList.add(
-      "show"
-    );
-
-  }
-);
-
-
-document
-.getElementById("close-options")
-.addEventListener(
-  "click",
-  function(){
-
-    optionsModal.classList.remove(
-      "show"
-    );
-
-  }
-);
-
-
-let soundOn = true;
-
-
-document
-.getElementById("sound-toggle")
-.addEventListener(
-  "click",
-  function(event){
-
-    soundOn =
-      !soundOn;
-
-    event.currentTarget.textContent =
-      soundOn
-      ? "ON"
-      : "OFF";
-
-  }
-);
-
-
-document
-.getElementById("clear-save")
-.addEventListener(
-  "click",
-  function(){
-
-    solved =
-      new Set();
-
-    saveProgress();
-
-    alert(
-      "진행 기록을 초기화했습니다."
-    );
-
-  }
-);
-
-
-/* =========================
-   RENDER SOLVED ITEMS
-========================= */
-
-function renderProgress(){
-
-  document
-  .querySelectorAll(
-    ".map-item"
-  )
-  .forEach(
-    element =>
-      element.remove()
-  );
-
-
-  document
-  .querySelectorAll(
-    ".item"
-  )
-  .forEach(
-    item => {
-
-      const key =
-        item.dataset.key;
-
-
-      if(
-        solved.has(key)
-      ){
-
-        item.classList.add(
-          "done"
-        );
-
-        placeOnMap(
-          item
-        );
-
-      }
-
-      else{
-
-        item.classList.remove(
-          "done"
-        );
-
-      }
-
+    const page=city.dataset.page;
+    if(page==="minsu"){
+      window.location.href="minsu.html";
+    }else if(page==="jiwon"){
+      alert("구지원 페이지는 다음 단계에서 연결할게.");
+    }else if(page==="mueun"){
+      alert("갈무은 페이지는 다음 단계에서 연결할게.");
     }
-  );
-
-}
-
-
-/* =========================
-   PLACE ITEM ON MAP
-========================= */
-
-function placeOnMap(
-  item
-){
-
-  const target =
-    document.getElementById(
-      item.dataset.target
-    );
-
-
-  const mapRect =
-    mapWrap.getBoundingClientRect();
-
-
-  const targetRect =
-    target.getBoundingClientRect();
-
-
-  const x =
-    (
-      targetRect.left
-      + targetRect.width / 2
-      - mapRect.left
-    )
-    / mapRect.width
-    * 100;
-
-
-  const y =
-    (
-      targetRect.top
-      + targetRect.height / 2
-      - mapRect.top
-    )
-    / mapRect.height
-    * 100;
-
-
-  const image =
-    document.createElement(
-      "img"
-    );
-
-
-  image.className =
-    "map-item";
-
-
-  image.src =
-    item.dataset.src;
-
-
-  image.alt =
-    "";
-
-
-  image.style.left =
-    x + "%";
-
-
-  image.style.top =
-    y + "%";
-
-
-  mapWrap.appendChild(
-    image
-  );
-
-}
-
-
-
-function openCharacterPage(key){
-  if(key === "busan"){
-    setTimeout(function(){
-      window.location.href = "minsu.html";
-    }, 450);
-  }
-}
-
-
-/* =========================
-   DRAG ITEMS
-========================= */
-
-document
-.querySelectorAll(
-  ".item"
-)
-.forEach(
-  item => {
-
-    let dragging =
-      false;
-
-    let ghost =
-      null;
-
-
-    item.addEventListener(
-      "pointerdown",
-      function(event){
-
-        if(
-          item.classList.contains(
-            "done"
-          )
-        ){
-          return;
-        }
-
-
-        dragging =
-          true;
-
-
-        item.setPointerCapture(
-          event.pointerId
-        );
-
-
-        mapWrap.classList.add(
-          "dragging"
-        );
-
-
-        ghost =
-          document.createElement(
-            "div"
-          );
-
-
-        ghost.className =
-          "drag-ghost";
-
-
-        ghost.innerHTML =
-          `<img src="${item.dataset.src}" alt="">`;
-
-
-        document.body.appendChild(
-          ghost
-        );
-
-
-        moveGhost(
-          event
-        );
-
-      }
-    );
-
-
-    item.addEventListener(
-      "pointermove",
-      function(event){
-
-        if(
-          !dragging
-          || !ghost
-        ){
-          return;
-        }
-
-
-        moveGhost(
-          event
-        );
-
-      }
-    );
-
-
-    item.addEventListener(
-      "pointerup",
-      function(event){
-
-        if(
-          !dragging
-        ){
-          return;
-        }
-
-
-        dragging =
-          false;
-
-
-        mapWrap.classList.remove(
-          "dragging"
-        );
-
-
-        const target =
-          document.getElementById(
-            item.dataset.target
-          );
-
-
-        const targetRect =
-          target.getBoundingClientRect();
-
-
-        const targetX =
-          targetRect.left
-          + targetRect.width / 2;
-
-
-        const targetY =
-          targetRect.top
-          + targetRect.height / 2;
-
-
-        const distance =
-          Math.hypot(
-            event.clientX - targetX,
-            event.clientY - targetY
-          );
-
-
-        const allowedDistance =
-          Math.max(
-            targetRect.width,
-            targetRect.height
-          )
-          * 1.45;
-
-
-        if(ghost){
-
-          ghost.remove();
-
-          ghost =
-            null;
-
-        }
-
-
-        if(
-          distance
-          <= allowedDistance
-        ){
-
-          const key =
-            item.dataset.key;
-
-
-          solved.add(
-            key
-          );
-
-
-          saveProgress();
-
-
-          item.classList.add(
-            "done"
-          );
-
-
-          placeOnMap(
-            item
-          );
-
-          openCharacterPage(key);
-
-
-          if(
-            solved.size === 3
-          ){
-
-            statusBox.textContent =
-              "세 개 전부 제자리. 그런데 대체, 이런 걸 흘리고 다니는 놈들이 누구지.";
-
-          }
-
-          else{
-
-            statusBox.textContent =
-              "찾았다.";
-
-          }
-
-        }
-
-        else{
-
-          statusBox.textContent =
-            "이곳은 아닌 것 같다.";
-
-        }
-
-      }
-    );
-
-
-    item.addEventListener(
-      "pointercancel",
-      function(){
-
-        dragging =
-          false;
-
-
-        mapWrap.classList.remove(
-          "dragging"
-        );
-
-
-        if(ghost){
-
-          ghost.remove();
-
-          ghost =
-            null;
-
-        }
-
-      }
-    );
-
-
-    function moveGhost(
-      event
-    ){
-
-      ghost.style.left =
-        event.clientX
-        + "px";
-
-
-      ghost.style.top =
-        event.clientY
-        + "px";
-
-    }
-
-  }
-);
-
+  });
+});
+
+/* 옵션 */
+document.getElementById("open-options").addEventListener("click",event=>{
+  event.stopPropagation();
+  if(menuLocked) return;
+  optionsModal.classList.add("show");
+});
+document.getElementById("close-options").addEventListener("click",()=>optionsModal.classList.remove("show"));
+
+let soundOn=true;
+document.getElementById("sound-toggle").addEventListener("click",event=>{
+  soundOn=!soundOn;
+  event.currentTarget.textContent=soundOn ? "ON" : "OFF";
+});
+
+document.getElementById("clear-save").addEventListener("click",()=>{
+  collected=new Set();
+  solved=new Set();
+  saveSet("samhaehoe-collected",collected);
+  saveSet("samhaehoe-solved",solved);
+  renderTitleSnacks();
+  alert("진행 기록을 초기화했습니다.");
+});
+
+renderTitleSnacks();
 </script>
-
 </body>
 </html>
