@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>어디에 두지?</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background: #171717;
+    color: #f4f0df;
+    font-family: "Courier New", "Dotum", monospace;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 20px 12px 36px;
+  }
+
+  .game {
+    width: min(760px, 100%);
+    text-align: center;
+  }
+
+  .top {
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(22px, 4vw, 34px);
+    letter-spacing: -1px;
+  }
+
+  .hint {
+    margin: 8px 0 0;
+    color: #bbb39e;
+    font-size: 14px;
+  }
+
+  .stage {
+    position: relative;
+    width: min(92vw, 560px);
+    aspect-ratio: 540 / 720;
+    margin: 14px auto 0;
+  }
+
+  .map {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .target {
+    position: absolute;
+    width: 11%;
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border: 2px dashed rgba(255,255,255,.35);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity .15s ease;
+  }
+
+  .stage.show-targets .target {
+    opacity: 1;
+  }
+
+  /* Target positions tuned to the provided map */
+  #target-incheon { left: 31%; top: 23%; }
+  #target-yangyang { left: 69%; top: 13%; }
+  #target-busan   { left: 72%; top: 64%; }
+
+  .status {
+    min-height: 24px;
+    margin: 8px 0 12px;
+    font-size: 14px;
+    color: #f3d36a;
+  }
+
+  .inventory {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: min(660px, 100%);
+    margin: 0 auto;
+  }
+
+  .item {
+    position: relative;
+    min-height: 142px;
+    padding: 10px 8px 8px;
+    border: 2px solid #57534a;
+    background: #232323;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+  }
+
+  .item:active { cursor: grabbing; }
+
+  .item img {
+    width: 92px;
+    height: 92px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+
+  .item .name {
+    display: block;
+    margin-top: 2px;
+    font-size: 13px;
+    color: #e8e3d6;
+  }
+
+  .item.done {
+    opacity: .35;
+    pointer-events: none;
+  }
+
+  .ghost {
+    position: fixed;
+    z-index: 999;
+    width: 110px;
+    height: 110px;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+
+  .ghost img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+  }
+
+  .snap {
+    position: absolute;
+    z-index: 4;
+    width: 13%;
+    transform: translate(-50%, -50%);
+    image-rendering: pixelated;
+    pointer-events: none;
+    animation: pop .18s steps(2, end);
+  }
+
+  @keyframes pop {
+    0% { transform: translate(-50%, -50%) scale(.7); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  .complete {
+    display: none;
+    margin: 16px auto 0;
+    padding: 16px;
+    width: min(500px, 100%);
+    border: 3px double #f4f0df;
+    background: #111;
+    font-size: 18px;
+  }
+
+  .complete.show { display: block; }
+
+  @media (max-width: 520px) {
+    .inventory { gap: 6px; }
+    .item { min-height: 116px; padding: 6px 4px; }
+    .item img { width: 72px; height: 72px; }
+    .item .name { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<main class="game">
+  <div class="top">
+    <h1>어디에 두지?</h1>
+    <p class="hint">물건을 알맞은 지역에 끌어다 놓아보세요.</p>
+  </div>
+
+  <section class="stage" id="stage" aria-label="대한민국 도트 지도">
+    <img class="map" src="assets/korea_map.png" alt="인천, 양양, 부산이 표시된 대한민국 도트 지도" />
+    <div class="target" id="target-incheon"></div>
+    <div class="target" id="target-yangyang"></div>
+    <div class="target" id="target-busan"></div>
+  </section>
+
+  <div class="status" id="status">물건을 잡아보세요.</div>
+
+  <section class="inventory">
+    <div class="item" data-key="busan" data-target="target-busan" data-src="assets/spicy_shrimp.png">
+      <img src="assets/spicy_shrimp.png" alt="매운 새우깡" />
+      <span class="name">매운 새우깡</span>
+    </div>
+    <div class="item" data-key="incheon" data-target="target-incheon" data-src="assets/sunglasses.png">
+      <img src="assets/sunglasses.png" alt="선글라스" />
+      <span class="name">선글라스</span>
+    </div>
+    <div class="item" data-key="yangyang" data-target="target-yangyang" data-src="assets/hawaiian_shirt.png">
+      <img src="assets/hawaiian_shirt.png" alt="하와이안 셔츠" />
+      <span class="name">하와이안 셔츠</span>
+    </div>
+  </section>
+
+  <div class="complete" id="complete">
+    끼룩.<br><br>
+    전부 제자리다.
+  </div>
+</main>
+
+<script>
+(() => {
+  const stage = document.getElementById("stage");
+  const status = document.getElementById("status");
+  const complete = document.getElementById("complete");
+  let solved = 0;
+
+  document.querySelectorAll(".item").forEach(item => {
+    let ghost = null;
+    let dragging = false;
+
+    item.addEventListener("pointerdown", (e) => {
+      if (item.classList.contains("done")) return;
+
+      dragging = true;
+      item.setPointerCapture(e.pointerId);
+      stage.classList.add("show-targets");
+
+      ghost = document.createElement("div");
+      ghost.className = "ghost";
+      ghost.innerHTML = `<img src="${item.dataset.src}" alt="">`;
+      document.body.appendChild(ghost);
+      moveGhost(e);
+      status.textContent = "지도 위에 놓아보세요.";
+    });
+
+    item.addEventListener("pointermove", (e) => {
+      if (!dragging || !ghost) return;
+      moveGhost(e);
+    });
+
+    item.addEventListener("pointerup", (e) => {
+      if (!dragging) return;
+      dragging = false;
+      stage.classList.remove("show-targets");
+
+      const target = document.getElementById(item.dataset.target);
+      const rect = target.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const distance = Math.hypot(e.clientX - cx, e.clientY - cy);
+      const allowed = Math.max(rect.width, rect.height) * 1.2;
+
+      if (ghost) {
+        ghost.remove();
+        ghost = null;
+      }
+
+      if (distance <= allowed) {
+        item.classList.add("done");
+
+        const stageRect = stage.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+
+        const snap = document.createElement("img");
+        snap.className = "snap";
+        snap.src = item.dataset.src;
+        snap.alt = "";
+        snap.style.left = `${((targetRect.left + targetRect.width/2 - stageRect.left) / stageRect.width) * 100}%`;
+        snap.style.top = `${((targetRect.top + targetRect.height/2 - stageRect.top) / stageRect.height) * 100}%`;
+        stage.appendChild(snap);
+
+        solved += 1;
+        status.textContent = "딱 맞았다.";
+
+        if (solved === 3) {
+          status.textContent = "전부 맞췄다.";
+          setTimeout(() => complete.classList.add("show"), 250);
+        }
+      } else {
+        status.textContent = "거긴 아닌 것 같은데...";
+      }
+    });
+
+    item.addEventListener("pointercancel", () => {
+      dragging = false;
+      stage.classList.remove("show-targets");
+      if (ghost) ghost.remove();
+      ghost = null;
+    });
+
+    function moveGhost(e) {
+      ghost.style.left = `${e.clientX}px`;
+      ghost.style.top = `${e.clientY}px`;
+    }
+  });
+})();
+</script>
+</body>
+</html>
