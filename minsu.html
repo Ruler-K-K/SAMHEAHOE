@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>제갈민수</title>
+<style>
+:root{
+  --sky:#bfe9f2;
+  --sea:#8bd0dd;
+  --cream:#fff7dd;
+  --ink:#193d54;
+  --line:#597f83;
+  --accent:#e9634f;
+  --yellow:#f4c85a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#9bd5e2}
+body{font-family:Arial,"Malgun Gothic",sans-serif;color:var(--ink)}
+.game{
+  width:min(100%,520px);
+  min-height:100dvh;
+  margin:0 auto;
+  background:
+    linear-gradient(#a9e0ef 0 46%,#7ec6d4 46% 58%,#f5e9bf 58%);
+  position:relative;
+  overflow:hidden;
+  padding:14px 12px 22px;
+}
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(255,247,221,.94);border:3px solid var(--ink);
+  padding:9px 11px;box-shadow:3px 3px 0 rgba(25,61,84,.16)
+}
+.name{font-size:22px;font-weight:900}
+.meta{font-size:11px;line-height:1.45;text-align:right;color:#49656f}
+.scene{
+  margin-top:10px;position:relative;height:390px;
+  border:3px solid var(--line);overflow:hidden;
+  background:
+    radial-gradient(circle at 20% 14%,rgba(255,255,255,.8) 0 2px,transparent 3px),
+    linear-gradient(#b9e9f3 0 58%,#6bbacb 58% 70%,#eedca4 70%);
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.32);
+}
+.scene:before{
+  content:"";position:absolute;left:0;right:0;top:58%;height:4px;background:#fff2c6;opacity:.8
+}
+.scene:after{
+  content:"";position:absolute;left:-5%;right:-5%;bottom:20%;height:22px;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.55) 0 2px,transparent 2px 6px);
+  opacity:.55
+}
+.charWrap{
+  position:absolute;left:50%;bottom:36px;transform:translateX(-50%);
+  width:170px;height:250px;display:flex;align-items:flex-end;justify-content:center;
+  transition:transform .18s ease;
+  z-index:3;
+}
+.charWrap img{max-width:100%;max-height:100%;image-rendering:pixelated;filter:drop-shadow(4px 5px 0 rgba(27,66,82,.18))}
+.charWrap.bounce{animation:bounce .42s ease 3}
+.charWrap.shake{animation:shake .18s linear 6}
+.charWrap.drive{animation:drive 1.2s ease forwards}
+@keyframes bounce{50%{transform:translateX(-50%) translateY(-24px)}}
+@keyframes shake{25%{transform:translateX(calc(-50% - 7px))}75%{transform:translateX(calc(-50% + 7px))}}
+@keyframes drive{100%{transform:translateX(125vw)}}
+
+.bubble{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  min-width:210px;max-width:88%;padding:10px 12px;
+  background:#fff8df;border:3px solid var(--ink);
+  font-size:13px;text-align:center;z-index:5;
+}
+.bubble:after{
+  content:"";position:absolute;left:48%;bottom:-11px;
+  border:6px solid transparent;border-top-color:var(--ink)
+}
+.effect{
+  position:absolute;z-index:7;font-size:34px;left:62%;top:39%;display:none
+}
+.effect.show{display:block;animation:pop .3s ease}
+@keyframes pop{from{transform:scale(.5)}to{transform:scale(1)}}
+
+.stats{
+  margin-top:9px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px
+}
+.stat{
+  background:#fff7dd;border:2px solid #6b8784;padding:7px 5px;text-align:center;font-size:10px
+}
+.stat b{display:block;font-size:15px;margin-top:2px}
+
+.invTitle{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:12px 0 6px;font-weight:900;font-size:13px
+}
+.inventory{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:7px
+}
+.item{
+  border:3px solid var(--line);background:#fff7dd;padding:7px 4px;
+  min-height:105px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;cursor:pointer;touch-action:manipulation;box-shadow:2px 2px 0 rgba(25,61,84,.12)
+}
+.item:active{transform:translateY(2px)}
+.item img{width:62px;height:62px;object-fit:contain;image-rendering:pixelated}
+.item span{font-size:10px;font-weight:900}
+.item small{font-size:9px;color:#68756f}
+
+.loot{
+  margin-top:8px;background:rgba(255,247,221,.88);border:2px dashed #6c8580;padding:8px
+}
+.loot h3{margin:0 0 5px;font-size:11px}
+.lootList{display:flex;gap:5px;flex-wrap:wrap;min-height:30px}
+.lootChip{
+  display:flex;align-items:center;gap:3px;background:#f7e8ba;border:1px solid #758a82;padding:3px 6px;font-size:9px
+}
+.lootChip img{width:20px;height:20px;image-rendering:pixelated}
+
+.toast{
+  position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+  background:#173e59;color:#fff8df;padding:8px 12px;border:2px solid #fff0bd;
+  font-size:11px;z-index:20;display:none;max-width:90%;text-align:center
+}
+.toast.show{display:block;animation:fade 1.9s ease forwards}
+@keyframes fade{0%{opacity:0;transform:translate(-50%,8px)}15%,75%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
+
+.tv{
+  display:none;position:absolute;right:16px;bottom:48px;width:110px;height:78px;
+  background:#243a46;border:6px solid #4b362d;z-index:4;padding:7px;color:white;text-align:center;
+  font-size:10px
+}
+.tv.show{display:grid;place-items:center}
+.reset{
+  margin-top:9px;width:100%;border:0;background:#1c4b62;color:white;padding:10px;font-weight:800
+}
+</style>
+</head>
+<body>
+<main class="game">
+  <header class="topbar">
+    <div>
+      <div class="name">제갈민수</div>
+      <div style="font-size:10px;margin-top:2px">삼해회 남부지부장</div>
+    </div>
+    <div class="meta">34세<br>갈매기 수인</div>
+  </header>
+
+  <section class="scene">
+    <div class="bubble" id="bubble">뭐꼬. 니 뭐하노?</div>
+    <div class="effect" id="effect">✨</div>
+    <div class="tv" id="tv">LOTTE<br>BASEBALL</div>
+    <div class="charWrap" id="charWrap">
+      <img id="character" src="assets/minsu-idle.png" alt="제갈민수 도트 캐릭터">
+    </div>
+    <div class="toast" id="toast"></div>
+  </section>
+
+  <div class="stats">
+    <div class="stat">새우깡<b id="snackCount">0</b></div>
+    <div class="stat">야구 전적<b id="record">0승 0패</b></div>
+    <div class="stat">외출<b id="rideCount">0</b></div>
+  </div>
+
+  <div class="invTitle"><span>INVENTORY</span><span>아이템을 눌러 사용</span></div>
+
+  <section class="inventory">
+    <button class="item" id="snackBtn">
+      <img src="assets/spicy-shrimp.png" alt="매운 새우깡">
+      <span>매운 새우깡</span><small>먹이기</small>
+    </button>
+    <button class="item" id="baseballBtn">
+      <img src="assets/baseball.png" alt="야구공">
+      <span>야구공</span><small>경기 보기</small>
+    </button>
+    <button class="item" id="rideBtn">
+      <img src="assets/motorcycle-key.png" alt="오토바이 키">
+      <span>오토바이 키</span><small>한 바퀴 돌기</small>
+    </button>
+  </section>
+
+  <section class="loot">
+    <h3>주워온 것</h3>
+    <div class="lootList" id="lootList"><span style="font-size:9px;color:#7b7b70">아직 없음.</span></div>
+  </section>
+
+  <button class="reset" id="mapReturnBtn">지도로 돌아가기</button>
+<button class="reset" id="resetBtn">민수 상태 초기화</button>
+</main>
+
+<script>
+const character = document.getElementById("character");
+const charWrap = document.getElementById("charWrap");
+const bubble = document.getElementById("bubble");
+const effect = document.getElementById("effect");
+const toast = document.getElementById("toast");
+const tv = document.getElementById("tv");
+
+let snackCount = 0;
+let wins = 0;
+let losses = 0;
+let rides = 0;
+let busy = false;
+let loot = [];
+
+const sprites = {
+  idle: "assets/minsu-idle.png",
+  walk: "assets/minsu-walk.png",
+  lounge: "assets/minsu-lounge.png",
+  happy: "assets/minsu-happy.png",
+  smile: "assets/minsu-smile.png",
+  neutral: "assets/minsu-neutral.png"
+};
+
+function say(text){ bubble.textContent = text; }
+function setSprite(name){ character.src = sprites[name]; }
+function sparkle(symbol="✨"){
+  effect.textContent = symbol;
+  effect.classList.remove("show");
+  void effect.offsetWidth;
+  effect.classList.add("show");
+  setTimeout(()=>effect.classList.remove("show"),650);
+}
+function notify(text){
+  toast.textContent=text;
+  toast.classList.remove("show");
+  void toast.offsetWidth;
+  toast.classList.add("show");
+}
+function resetAnim(){
+  charWrap.className="charWrap";
+}
+function updateStats(){
+  document.getElementById("snackCount").textContent = snackCount;
+  document.getElementById("record").textContent = `${wins}승 ${losses}패`;
+  document.getElementById("rideCount").textContent = rides;
+}
+
+document.getElementById("snackBtn").addEventListener("click", ()=>{
+  if(busy) return;
+  busy=true;
+  snackCount++;
+  updateStats();
+
+  if(snackCount >= 5){
+    setSprite("lounge");
+    resetAnim(); charWrap.classList.add("shake");
+    say("……잠깐. 배가 와 이라노.");
+    sparkle("💦");
+    notify("매운 새우깡 과식! 배탈 이벤트 발생.");
+    setTimeout(()=>{ resetAnim(); setSprite("idle"); say("오늘은 진짜 그만 묵는다."); busy=false; },2200);
+    return;
+  }
+
+  setSprite("happy");
+  resetAnim(); charWrap.classList.add("bounce");
+  say(snackCount===1 ? "오. 이거 내 좋아하는 기다." : "한 봉지만 더.");
+  sparkle("🌶️");
+  setTimeout(()=>{ resetAnim(); setSprite("idle"); busy=false; },1100);
+});
+
+document.getElementById("baseballBtn").addEventListener("click", ()=>{
+  if(busy) return;
+  busy=true;
+  tv.classList.add("show");
+  setSprite("lounge");
+  say("쉿. 지금 중요한 순간이다.");
+  setTimeout(()=>{
+    const win = Math.random() < 0.5;
+    if(win){
+      wins++;
+      setSprite("happy");
+      resetAnim(); charWrap.classList.add("bounce");
+      say("됐다!! 이겼다 아이가!");
+      sparkle("⚾");
+    }else{
+      losses++;
+      setSprite("neutral");
+      resetAnim(); charWrap.classList.add("shake");
+      say("……아. 오늘은 말 걸지 마라.");
+      sparkle("💢");
+    }
+    updateStats();
+    setTimeout(()=>{
+      tv.classList.remove("show");
+      resetAnim(); setSprite("idle"); say("다음 경기 보면 된다."); busy=false;
+    },1900);
+  },1200);
+});
+
+const lootTable = [
+  {name:"500원", img:"assets/coin.png", text:"길바닥에서 500원을 주웠다."},
+  {name:"주차딱지", img:"assets/parking-ticket.png", text:"기분 좋게 나갔다가 주차딱지를 받아왔다."},
+  {name:"갈매기 깃털", img:"assets/feather.png", text:"왜 붙어온 건지 모를 갈매기 깃털."},
+  {name:"선글라스", img:"assets/sunglasses.png", text:"어디서 많이 본 선글라스를 주워왔다."}
+];
+
+document.getElementById("rideBtn").addEventListener("click", ()=>{
+  if(busy) return;
+  busy=true;
+  rides++;
+  updateStats();
+  setSprite("walk");
+  say("한 바퀴 돌고 온다.");
+  resetAnim(); charWrap.classList.add("drive");
+
+  setTimeout(()=>{
+    const gotNothing = Math.random() < 0.22;
+    resetAnim();
+    setSprite("idle");
+
+    if(gotNothing){
+      say("뭘 기대하노.");
+      notify("아무것도 주워오지 않았다.");
+    }else{
+      const item = lootTable[Math.floor(Math.random()*lootTable.length)];
+      loot.push(item);
+      say("이거 길에 떨어져 있더라.");
+      notify(item.text);
+      renderLoot();
+    }
+    busy=false;
+  },1500);
+});
+
+function renderLoot(){
+  const box=document.getElementById("lootList");
+  box.innerHTML="";
+  loot.forEach(item=>{
+    const chip=document.createElement("div");
+    chip.className="lootChip";
+    chip.innerHTML=`<img src="${item.img}" alt="">${item.name}`;
+    box.appendChild(chip);
+  });
+}
+
+document.getElementById("mapReturnBtn").addEventListener("click", ()=>{ window.location.href="index.html"; });
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  snackCount=0; wins=0; losses=0; rides=0; loot=[]; busy=false;
+  renderLoot(); updateStats(); resetAnim(); setSprite("idle");
+  tv.classList.remove("show"); say("뭐꼬. 니 뭐하노?");
+});
+</script>
+</body>
+</html>

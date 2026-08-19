@@ -1312,6 +1312,16 @@ function placeOnMap(
 }
 
 
+
+function openCharacterPage(key){
+  if(key === "busan"){
+    setTimeout(function(){
+      window.location.href = "minsu.html";
+    }, 450);
+  }
+}
+
+
 /* =========================
    DRAG ITEMS
 ========================= */
@@ -1494,6 +1504,8 @@ document
           placeOnMap(
             item
           );
+
+          openCharacterPage(key);
 
 
           if(
