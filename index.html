@@ -87,17 +87,30 @@ body{display:flex;justify-content:center}
   background:linear-gradient(#b6e6f0 0%,#e3f1e7 48%,#fff1c9 100%);
 }
 #map-screen.show{display:block}
-.map-head{text-align:center;margin-bottom:8px}
+.map-head{text-align:center;margin-bottom:10px}
 .map-logo{
-  font-family:Georgia,"Times New Roman",serif;font-size:37px;font-weight:900;letter-spacing:.04em;
-  color:var(--navy);text-shadow:2px 0 #fff3cf,-2px 0 #fff3cf,0 2px #fff3cf,0 -2px #fff3cf;
+  font-family:inherit;font-size:39px;font-weight:900;letter-spacing:.05em;
+  color:var(--navy);
+  text-shadow:3px 0 #fff3cf,-3px 0 #fff3cf,0 3px #fff3cf,0 -3px #fff3cf,2px 2px #fff3cf,-2px -2px #fff3cf;
 }
-.map-sub{margin-top:3px;font-size:12px;letter-spacing:.18em;font-weight:800;color:#4e7180}
+.map-sub{
+  margin-top:3px;font-family:inherit;font-size:11px;letter-spacing:.28em;
+  font-weight:900;color:var(--navy);
+}
+.map-ornament{
+  width:145px;margin:5px auto 0;display:flex;align-items:center;justify-content:center;
+  gap:7px;color:var(--navy);
+}
+.map-ornament span{flex:1;height:2px;background:var(--navy)}
+.map-ornament b{font-family:inherit;font-size:14px;line-height:1}
 .map-wrap{
   position:relative;width:100%;max-width:500px;margin:0 auto;border:3px solid var(--navy);
   background:#80cde2;overflow:hidden;box-shadow:0 4px 0 rgba(19,59,97,.14)
 }
 .map-image{display:block;width:100%;height:auto;image-rendering:pixelated}
+#map-screen,#map-screen button,#map-screen .city,#map-screen #status,#map-screen .inventory-title,#map-screen .item{
+  font-family:inherit;font-weight:900;
+}
 
 /* 도시 */
 .city{
@@ -201,6 +214,7 @@ body{display:flex;justify-content:center}
   <header class="map-head">
     <div class="map-logo">三海會</div>
     <div class="map-sub">SAMHAEHOE</div>
+    <div class="map-ornament"><span></span><b>⚓</b><span></span></div>
   </header>
 
   <div class="map-wrap" id="map-wrap">
@@ -220,7 +234,7 @@ body{display:flex;justify-content:center}
     </div>
   </div>
 
-  <div id="status">가져온 것부터 확인해보자.</div>
+  <div id="status">과자를 알맞은 지역에 놓아 보세요.</div>
 
   <div class="inventory-title">LOST &amp; FOUND</div>
 
@@ -426,7 +440,7 @@ function renderMap(){
   }else if(collected.size===0){
     statusBox.textContent="가진 게 없다.";
   }else{
-    statusBox.textContent="가져온 것부터 확인해보자.";
+    statusBox.textContent="과자를 알맞은 지역에 놓아 보세요.";
   }
 }
 
